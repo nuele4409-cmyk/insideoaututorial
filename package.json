@@ -1,0 +1,27 @@
+{
+  "name": "oau-ai-tutor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Stateful, autonomous AI tutor engine simulating a strict OAU-standard Nigerian Post-UTME tutor, powered by the Claude API.",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "server": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "demo": "tsx src/demo.ts",
+    "seed": "tsx src/db/seed.ts --reset"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": ">=0.40.0",
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

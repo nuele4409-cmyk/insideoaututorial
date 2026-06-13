@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# Local data store (only used in local mode, not Supabase)
+data/
+
+# Temp / log files
+*.log
+tmp_*
+server_out.txt
+tmp_server_check.txt
+
+# OS files
+.DS_Store
+Thumbs.db

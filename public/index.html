@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#06070F" />
+  <meta name="color-scheme" content="dark" />
+  <title>Virtual Tutorial — Post-UTME</title>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        var had = regs.length > 0;
+        regs.forEach(function (r) { r.unregister(); });
+        if (window.caches && caches.keys) {
+          caches.keys().then(function (keys) { keys.forEach(function (k) { caches.delete(k); }); });
+        }
+        if (had) location.reload();
+      }).catch(function () {});
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/styles.css?v=6" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body class="s-dark">
+
+  <!-- ── Login overlay ───────────────────────────────────────────────────────── -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+      <div class="login-brand">
+        <span class="brand-mark">🏫</span>
+        <h1>Virtual <span class="grad">Tutorial</span></h1>
+      </div>
+      <p class="login-sub">Sign in with your Inside OAU! account</p>
+      <div id="loginError" class="login-error"></div>
+      <input id="loginEmail" class="auth-input" type="email" placeholder="Email address" autocomplete="username" />
+      <input id="loginPassword" class="auth-input" type="password" placeholder="Password" autocomplete="current-password" />
+      <button id="loginBtn" class="btn btn-primary login-btn">Sign in</button>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🏫</div>
+      <div class="brand-text">
+        <h1>Virtual <span class="grad">Tutorial</span></h1>
+        <p>Post-UTME Virtual Classroom</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button id="adminClassBtn" class="admin-btn" hidden>📋 Open Class</button>
+      <button id="adminGradeBtn" class="admin-btn" hidden>📝 Grade</button>
+      <button id="adminQuestionsBtn" class="admin-btn" hidden>📬 Questions</button>
+      <button id="adminOutlinesBtn" class="admin-btn" hidden>📚 Outlines</button>
+      <div id="modeBadge" class="badge badge-muted" style="display:none"></div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+    <aside class="sidebar">
+      <section class="card">
+        <label class="field-label" for="studentSelect">Student</label>
+        <select id="studentSelect" class="select"></select>
+        <button id="newStudentToggle" class="link-btn" type="button">+ New student</button>
+        <div id="newStudentForm" class="new-student hidden">
+          <input id="newStudentName" class="input" placeholder="Full name" />
+          <select id="newStudentDept" class="select">
+            <option value="Science">Science</option>
+            <option value="Commercial">Commercial</option>
+          </select>
+          <button id="newStudentCreate" class="btn btn-secondary" type="button">Create student</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <label class="field-label" for="subjectSelect">Subject</label>
+        <select id="subjectSelect" class="select"></select>
+      </section>
+
+      <section class="card status-card">
+        <div class="card-title">Today's Progress</div>
+        <div class="status-row"><span>Day</span><strong id="statDay">—</strong></div>
+        <div class="status-row"><span>Topic</span><strong id="statTopic">—</strong></div>
+        <div class="status-row"><span>Score</span><strong id="statScore">—</strong></div>
+        <div class="status-row"><span>Submitted</span><strong id="statSubmitted">—</strong></div>
+      </section>
+
+      <section class="card announce-card">
+        <div class="announce-label">📣 Upcoming Event</div>
+        <p id="announceText">—</p>
+        <a id="announceLink" class="announce-link" target="_blank" rel="noopener" hidden>Go to event →</a>
+      </section>
+    </aside>
+
+    <!-- ── Classroom ────────────────────────────────────────────────────────── -->
+    <section class="classroom">
+      <div id="classroomBanner" class="banner hidden"></div>
+
+      <!-- No lesson yet -->
+      <div id="noLesson" class="no-lesson-card">
+        <div class="no-lesson-icon">📭</div>
+        <h2>Waiting for class to open</h2>
+        <p>Select a subject. When the admin opens today's class, the lesson will appear here.</p>
+      </div>
+
+      <!-- Lesson view (hidden until lesson loads) -->
+      <div id="lessonView" class="lesson-view hidden">
+
+        <div class="lesson-header">
+          <span class="lesson-day-tag" id="lessonDayTag">Day —</span>
+          <h2 class="lesson-topic" id="lessonTopic">—</h2>
+        </div>
+
+        <div class="lesson-body" id="lessonBody"></div>
+
+        <!-- ── CLASSWORK ──────────────────────────────────────────────────── -->
+        <!-- Classwork card — appears after lesson reveals -->
+        <div id="classworkCard" class="assignment-card classwork-card hidden">
+          <div class="assignment-label">✏️ Classwork</div>
+          <div id="classworkText" class="assignment-text"></div>
+        </div>
+
+        <!-- Classwork: not yet submitted -->
+        <div id="classworkSubmitSection" class="submit-section hidden">
+          <label class="field-label" for="classworkInput">Your Classwork Answer</label>
+          <textarea
+            id="classworkInput"
+            class="answer-input"
+            rows="5"
+            placeholder="Answer the classwork question here — or attach a photo below."
+          ></textarea>
+          <div class="attach-row">
+            <label class="attach-btn" for="classworkFile">
+              📎 Attach image or PDF
+              <input id="classworkFile" type="file" accept="image/*,application/pdf" style="display:none" />
+            </label>
+            <span id="classworkAttachName" class="attach-name"></span>
+            <button id="classworkAttachClear" class="link-btn attach-clear hidden" type="button">✕ Remove</button>
+          </div>
+          <button id="classworkSubmitBtn" class="btn btn-accent submit-btn" type="button">Submit Classwork</button>
+        </div>
+
+        <!-- Classwork: submitted, awaiting grade -->
+        <div id="classworkAwaitingSection" class="awaiting-section hidden">
+          <div class="awaiting-icon">⏳</div>
+          <p>Classwork submitted — your teacher will grade it soon.</p>
+          <button id="classworkRefreshBtn" class="btn btn-secondary" type="button">Check for result</button>
+        </div>
+
+        <!-- Classwork: grade received -->
+        <div id="classworkGradeSection" class="grade-section hidden">
+          <div class="grade-header">Classwork Result</div>
+          <div class="grade-score-row">
+            <span class="grade-number" id="classworkGradeNumber">—</span>
+            <span class="grade-denom">/10</span>
+            <div class="grade-bar-wrap">
+              <div class="grade-bar" id="classworkGradeBar"></div>
+            </div>
+          </div>
+          <div class="grade-feedback" id="classworkGradeFeedback"></div>
+        </div>
+
+        <!-- ── ASSIGNMENT ──────────────────────────────────────────────────── -->
+        <!-- Assignment card — hidden until reveal reaches it -->
+        <div id="assignmentCard" class="assignment-card hidden">
+          <div class="assignment-label">📝 Assignment</div>
+          <div id="assignmentText" class="assignment-text"></div>
+        </div>
+
+        <!-- Not yet submitted -->
+        <div id="submitSection" class="submit-section hidden">
+          <label class="field-label" for="answerInput">Your Assignment Answer</label>
+          <textarea
+            id="answerInput"
+            class="answer-input"
+            rows="6"
+            placeholder="Type your answer here — or attach a photo/scan below. You can do both."
+          ></textarea>
+
+          <!-- File attachment -->
+          <div class="attach-row">
+            <label class="attach-btn" for="answerFile">
+              📎 Attach image or PDF
+              <input id="answerFile" type="file" accept="image/*,application/pdf" style="display:none" />
+            </label>
+            <span id="attachName" class="attach-name"></span>
+            <button id="attachClear" class="link-btn attach-clear hidden" type="button">✕ Remove</button>
+          </div>
+
+          <button id="submitBtn" class="btn btn-accent submit-btn" type="button">Submit Assignment</button>
+        </div>
+
+        <!-- Submitted, awaiting grade -->
+        <div id="awaitingSection" class="awaiting-section hidden">
+          <div class="awaiting-icon">⏳</div>
+          <p>Assignment submitted — your teacher will grade it soon.</p>
+          <button id="refreshGradeBtn" class="btn btn-secondary" type="button">Check for result</button>
+        </div>
+
+        <!-- Grade received -->
+        <div id="gradeSection" class="grade-section hidden">
+          <div class="grade-header">Assignment Result</div>
+          <div class="grade-score-row">
+            <span class="grade-number" id="gradeNumber">—</span>
+            <span class="grade-denom">/10</span>
+            <div class="grade-bar-wrap">
+              <div class="grade-bar" id="gradeBar"></div>
+            </div>
+          </div>
+          <div class="grade-feedback" id="gradeFeedback"></div>
+        </div>
+
+        <!-- Question section — appears after reveal, always visible post-lesson -->
+        <div id="questionSection" class="question-section hidden">
+          <div class="question-divider">That's a wrap for today's class</div>
+          <div class="question-header">
+            <span class="question-icon">❓</span>
+            <div>
+              <div class="question-title">Got a question from today's lesson?</div>
+              <div class="question-sub">Send it here. We will answer it in our WhatsApp group.</div>
+            </div>
+          </div>
+          <textarea
+            id="questionInput"
+            class="answer-input question-input"
+            rows="3"
+            placeholder="Type your question here…"
+          ></textarea>
+          <div class="attach-row">
+            <label class="attach-btn" for="questionFile">
+              📎 Attach file (optional)
+              <input id="questionFile" type="file" accept="image/*,application/pdf" style="display:none" />
+            </label>
+            <span id="questionAttachName" class="attach-name"></span>
+            <button id="questionAttachClear" class="link-btn attach-clear hidden" type="button">✕ Remove</button>
+          </div>
+          <div id="questionSubmittedMsg" class="question-sent hidden">
+            ✓ Question sent — watch the WhatsApp group for the answer.
+          </div>
+          <button id="submitQuestionBtn" class="btn btn-secondary submit-question-btn" type="button">
+            Send Question
+          </button>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Admin: Open Class modal ─────────────────────────────────────────────── -->
+  <div id="classModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-head">
+        <h2>📋 Open Today's Classes</h2>
+        <button id="classModalClose" class="modal-close" aria-label="Close">✕</button>
+      </div>
+      <p class="modal-sub">
+        Generate a shared lesson for each subject. Students see it immediately. Each lesson costs one AI call.
+      </p>
+      <div id="classSubjectList" class="class-subject-list"></div>
+      <div id="classModalMsg" class="modal-msg"></div>
+    </div>
+  </div>
+
+  <!-- ── Admin: Manual grading panel ───────────────────────────────────────────── -->
+  <div id="gradeModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-head">
+        <h2>📝 Grade Submissions</h2>
+        <button id="gradeModalClose" class="modal-close" aria-label="Close">✕</button>
+      </div>
+      <p class="modal-sub">
+        Review each student's answer and enter a score (0–10) with brief feedback. Hit Save for each row.
+      </p>
+      <div class="grade-picker-row">
+        <label class="field-label" for="gradeSubjectPick">Subject</label>
+        <select id="gradeSubjectPick" class="select grade-subject-select"></select>
+        <div class="grade-type-tabs">
+          <button id="gradeTabClasswork" class="grade-tab grade-tab-active" data-type="classwork">✏️ Classwork</button>
+          <button id="gradeTabAssignment" class="grade-tab" data-type="assignment">📝 Assignment</button>
+        </div>
+        <button id="gradeLoadBtn" class="btn btn-secondary btn-sm">Load submissions</button>
+      </div>
+      <div id="gradeList" class="grade-list"></div>
+      <div id="gradeModalMsg" class="modal-msg"></div>
+    </div>
+  </div>
+
+  <!-- ── Admin: Student questions panel ─────────────────────────────────────── -->
+  <div id="questionsModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-head">
+        <h2>📬 Student Questions</h2>
+        <button id="questionsModalClose" class="modal-close" aria-label="Close">✕</button>
+      </div>
+      <p class="modal-sub">
+        Questions submitted after today's lessons. Answer them in the WhatsApp group.
+      </p>
+      <div class="grade-picker-row">
+        <label class="field-label" for="questionsSubjectPick">Subject</label>
+        <select id="questionsSubjectPick" class="select grade-subject-select">
+          <option value="">All subjects</option>
+        </select>
+        <button id="questionsLoadBtn" class="btn btn-secondary btn-sm">Load</button>
+        <button id="questionsDownloadBtn" class="btn btn-secondary btn-sm" style="margin-left:auto">📥 Download</button>
+      </div>
+      <div id="questionsList" class="grade-list"></div>
+      <div id="questionsModalMsg" class="modal-msg"></div>
+    </div>
+  </div>
+
+  <!-- ── Admin: upload course outlines ───────────────────────────────────────── -->
+  <div id="outlinesModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>📚 Upload course outlines</h2>
+        <button id="outlinesClose" class="modal-close" aria-label="Close">✕</button>
+      </div>
+      <p class="modal-sub">
+        CSV with columns <code>subject, day, topic, outline</code>. The <code>subject</code> must match the
+        app's keys (physics, chemistry, biology, economics, government, english, mathematics, literature,
+        commerce, accounting, geography, history, agric, crs, irs…). A row replaces that subject+day.
+      </p>
+      <a class="modal-template" href="/outline_template.csv" download>⬇ Download template CSV</a>
+      <input type="file" id="outlinesFile" accept=".csv,text/csv" class="modal-file" />
+      <button id="outlinesUploadBtn" class="btn btn-primary modal-upload">Upload outlines</button>
+      <div id="outlinesMsg" class="modal-msg"></div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=6"></script>
+</body>
+</html>
