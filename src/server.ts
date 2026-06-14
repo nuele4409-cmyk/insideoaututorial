@@ -168,6 +168,48 @@ app.post(
 
 // ── Inside OAU! integration: account login + scheduled-mock events ───────────
 
+/** Shared: build the login/restore response payload from a verified profile + token. */
+async function buildSessionPayload(userId: string, token: string) {
+  const profile = await cbt.getProfile(userId);
+  if (!profile) throw Object.assign(new Error('No Post-UTME profile found for this account.'), { status: 403 });
+  if (!profile.has_post_utme_access && !profile.is_admin)
+    throw Object.assign(new Error('Access denied — your Post-UTME portal access is not active.'), { status: 403 });
+
+  const studentId = profile.student_id || `IOAU-${userId.slice(0, 8)}`;
+  let student = await repo.getStudent(studentId);
+  if (!student) {
+    student = await repo.createStudent({
+      id: studentId,
+      full_name: profile.full_name || 'Student',
+      department: POSTUTME_DEPT,
+    });
+  }
+
+  const chosen = Array.isArray(profile.post_utme_subjects)
+    ? (profile.post_utme_subjects as string[])
+    : [];
+  const keys = chosen.length ? chosen : ALL_SUBJECT_KEYS;
+  const track = inferTrack(keys);
+  const subjects = await Promise.all(
+    keys.map(async (key) => ({
+      key,
+      label: subjectLabel(key),
+      days: await repo.maxCurriculumDay(POSTUTME_DEPT, key),
+      department: lessonDept(key, track),
+    })),
+  );
+
+  return {
+    token,
+    studentId,
+    full_name: student.full_name,
+    isAdmin: !!profile.is_admin,
+    university: profile.selected_university ?? null,
+    track,
+    subjects,
+  };
+}
+
 app.post(
   '/api/auth/login',
   wrap(async (req, res) => {
@@ -186,53 +228,35 @@ app.post(
       return;
     }
 
-    const profile = await cbt.getProfile(auth.userId);
-    if (!profile) {
-      res.status(403).json({ error: 'No Post-UTME profile found for this account.' });
+    try {
+      const payload = await buildSessionPayload(auth.userId, auth.token);
+      res.json(payload);
+    } catch (e: any) {
+      res.status(e.status ?? 403).json({ error: e.message });
+    }
+  }),
+);
+
+// Restore a saved session — verifies the stored token and returns fresh profile data.
+app.get(
+  '/api/auth/restore',
+  wrap(async (req, res) => {
+    const header = req.headers.authorization;
+    if (!header?.startsWith('Bearer ')) {
+      res.status(401).json({ error: 'No token.' });
       return;
     }
-    if (!profile.has_post_utme_access && !profile.is_admin) {
-      res.status(403).json({
-        error: 'Access denied — your Post-UTME portal access is not active.',
-      });
+    const verified = await cbt.verifyToken(header.slice(7));
+    if (!verified) {
+      res.status(401).json({ error: 'Session expired. Please log in again.' });
       return;
     }
-
-    // Mirror the student into the tutor's own store, keyed by their IOAU id.
-    const studentId = profile.student_id || `IOAU-${auth.userId.slice(0, 8)}`;
-    let student = await repo.getStudent(studentId);
-    if (!student) {
-      student = await repo.createStudent({
-        id: studentId,
-        full_name: profile.full_name || 'Student',
-        department: POSTUTME_DEPT,
-      });
+    try {
+      const payload = await buildSessionPayload(verified.userId, header.slice(7));
+      res.json(payload);
+    } catch (e: any) {
+      res.status(e.status ?? 403).json({ error: e.message });
     }
-
-    // Subjects = the student's own picks from the CBT app (fallback: full list).
-    const chosen = Array.isArray(profile.post_utme_subjects)
-      ? (profile.post_utme_subjects as string[])
-      : [];
-    const keys = chosen.length ? chosen : ALL_SUBJECT_KEYS;
-    const track = inferTrack(keys);
-    const subjects = await Promise.all(
-      keys.map(async (key) => ({
-        key,
-        label: subjectLabel(key),
-        days: await repo.maxCurriculumDay(POSTUTME_DEPT, key),
-        department: lessonDept(key, track),
-      })),
-    );
-
-    res.json({
-      token: auth.token,
-      studentId,
-      full_name: student.full_name,
-      isAdmin: !!profile.is_admin,
-      university: profile.selected_university ?? null,
-      track,
-      subjects,
-    });
   }),
 );
 

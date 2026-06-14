@@ -27,6 +27,32 @@ async function api(path, opts = {}) {
   return data;
 }
 
+// ── Session persistence ───────────────────────────────────────────────────────
+const SESSION_KEY = 'oau_tutor_session';
+
+function saveSession(data) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      token: data.token,
+      studentId: data.studentId,
+      full_name: data.full_name,
+      isAdmin: !!data.isAdmin,
+      university: data.university ?? null,
+      track: data.track,
+      subjects: data.subjects,
+    }));
+  } catch {}
+}
+
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY); } catch {}
+}
+
+function logout() {
+  clearSession();
+  location.reload();
+}
+
 // ── Boot ─────────────────────────────────────────────────────────────────────
 async function init() {
   try {
@@ -36,6 +62,28 @@ async function init() {
     setMode(null);
   }
   wireEvents();
+
+  // Try to restore a previously saved session
+  let savedToken = null;
+  try { savedToken = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}')?.token; } catch {}
+
+  if (savedToken) {
+    state.token = savedToken; // set so api() sends Authorization header
+    try {
+      const data = await api('/api/auth/restore');
+      // Token still valid — enter without showing login
+      $('loginOverlay').classList.add('hidden');
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      await enterAsStudent(data);
+    } catch {
+      // Expired or invalid — clear and stay on login screen
+      state.token = null;
+      clearSession();
+    }
+  }
 }
 
 function setMode(tutor, model) {
@@ -790,6 +838,9 @@ async function enterAsStudent(data) {
   state.track = data.track || 'science';
   state.student = { id: data.studentId, full_name: data.full_name, department: state.track };
 
+  // Persist session so next load skips login
+  saveSession(data);
+
   const sel = $('studentSelect');
   sel.innerHTML = '';
   const o = document.createElement('option');
@@ -815,6 +866,9 @@ async function enterAsStudent(data) {
     $('adminQuestionsBtn').hidden = false;
     $('adminResetBtn').hidden = false;
   }
+
+  // Show logout button for all logged-in users
+  $('logoutBtn').hidden = false;
 
   await loadClassroom();
   await loadEvents();
@@ -1352,6 +1406,9 @@ function wireEvents() {
 
   // Admin — Reset all lessons
   $('adminResetBtn').addEventListener('click', resetAllLessons);
+
+  // Logout
+  $('logoutBtn').addEventListener('click', logout);
 }
 
 init();

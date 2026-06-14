@@ -359,6 +359,13 @@ body.s-dark {
 .admin-btn:hover { filter: brightness(1.06); }
 .admin-btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
 .admin-btn-danger:hover { background: rgba(239,68,68,0.25); filter: none; }
+.logout-btn {
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font);
+  padding: 7px 14px; border-radius: 999px;
+  color: var(--dim); background: transparent;
+  border: 1px solid var(--brd);
+}
+.logout-btn:hover { color: var(--white); border-color: var(--muted); }
 
 .modal-overlay {
   position: fixed; inset: 0; z-index: 120;
@@ -614,6 +621,7 @@ body.s-dark {
   }
   .topbar-right::-webkit-scrollbar { display: none; }
   .admin-btn { font-size: 12px; padding: 7px 13px; white-space: nowrap; flex-shrink: 0; }
+  .logout-btn { font-size: 12px; padding: 7px 13px; white-space: nowrap; flex-shrink: 0; }
 
   /* Login — fixed center, no scroll */
   .login-overlay {
