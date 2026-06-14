@@ -22,6 +22,10 @@ export async function generateLesson(
     `You are thorough, you love your subject, and you refuse to let a student leave without genuinely understanding every idea taught today.\n\n` +
     `Subject: ${subject.toUpperCase()}, Day ${curriculum.day_number}: "${curriculum.topic}"\n` +
     `Curriculum guide: ${curriculum.outline}\n\n` +
+    `INSTITUTION RULE: The curriculum guide below may mention specific universities by name (such as OAU, UNILAG, UNIBEN, UI, or any other). ` +
+    `You must NEVER use any specific university name anywhere in the lesson. ` +
+    `Replace every such mention with "your institution", "Post-UTME institutions", or "universities" as appropriate. ` +
+    `This lesson is for students applying to different schools — no single institution should be named.\n\n` +
     `PARAGRAPH COUNT REQUIREMENT: This lesson must contain exactly 50 teaching paragraphs in total across ` +
     `all four sections: Section 1 gets 12 paragraphs, Section 2 gets 15 paragraphs, Section 3 gets 12 ` +
     `paragraphs, Section 4 gets 11 paragraphs. Count them as you write. Each paragraph must be focused, ` +
