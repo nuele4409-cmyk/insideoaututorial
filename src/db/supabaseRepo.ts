@@ -350,16 +350,18 @@ export async function getLessonStatus(date: string) {
 
 export async function resetAllLessons(): Promise<number> {
   // Count first so we can report how many were deleted
-  const { count } = await sb
+  const { count, error: countErr } = await sb
     .from('tutor_daily_lessons')
     .select('id', { count: 'exact', head: true });
+  if (countErr) throw new Error(countErr.message);
   const total = count ?? 0;
   if (total > 0) {
+    // day_number is an integer column always >= 1 — safe universal filter for UUID-keyed table
     const { error } = await sb
       .from('tutor_daily_lessons')
       .delete()
-      .neq('id', 0); // delete all rows (neq 0 matches everything since id > 0)
-    if (error) throw error;
+      .gt('day_number', 0);
+    if (error) throw new Error(error.message);
   }
   return total;
 }
