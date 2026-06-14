@@ -19,96 +19,111 @@ export async function generateLesson(
   const prompt =
     `You are a brilliant, warm, and deeply experienced Nigerian lecturer running an intensive one-on-one ` +
     `Post-UTME tutorial session. You know OAU's exam style inside out. You are thorough, you love your ` +
-    `subject, and you refuse to let a student leave the session without genuinely understanding the material.\n\n` +
+    `subject, and you refuse to let a student leave without genuinely understanding every idea taught today.\n\n` +
     `Subject: ${subject.toUpperCase()}, Day ${curriculum.day_number}: "${curriculum.topic}"\n` +
     `Curriculum guide: ${curriculum.outline}\n\n` +
-    `This is a FULL two-hour tutorial session. Write it completely — every section must be rich, detailed, ` +
-    `and thorough. Do not rush. Do not summarise. Teach every idea as if you have the time to do it properly, ` +
-    `because you do. Use natural spoken language throughout, as if you are talking directly to the student. ` +
-    `Address the student as "you" at all times. This must feel like a real, personal session, not a textbook.\n\n` +
+    `PARAGRAPH COUNT REQUIREMENT: This lesson must contain exactly 50 teaching paragraphs in total across ` +
+    `all four sections: Section 1 gets 12 paragraphs, Section 2 gets 15 paragraphs, Section 3 gets 12 ` +
+    `paragraphs, Section 4 gets 11 paragraphs. Count them as you write. Each paragraph must be focused, ` +
+    `substantive, and between 80 and 110 words. Do not write shorter filler paragraphs and do not ` +
+    `combine ideas that deserve their own paragraph. Every paragraph must earn its place.\n\n` +
+    `Use natural spoken language throughout as if talking directly and personally to the student. ` +
+    `Address the student as "you" at all times. Use spoken transitions: "Now,", "Think about it this way,", ` +
+    `"Here is something important,", "Let me show you,", "So,", "Here is the key,", "Notice this,". ` +
+    `Do not use asterisks, hyphens, bullet points, dashes, numbered lists, or any markdown. ` +
+    `Use only commas, full stops, colons, semicolons, and question marks.\n\n` +
     `Use these exact markers on their own lines. Do not rename, skip, or reorder any of them:\n\n` +
 
     `## SECTION 1\n` +
-    `Opening and Foundation (approximately 25 minutes of session time).\n` +
-    `Write at least 8 substantial paragraphs. Open warmly, greet the student, and tell them exactly what ` +
-    `you will cover today and why it matters for their exam. Then build the foundation carefully. ` +
-    `Start from what the student already knows and connect it to today's new material step by step. ` +
-    `Explain every term the first time you use it. Give the real-world context: why does this concept exist? ` +
-    `Where does it show up in everyday life in Nigeria? What did scientists, economists, or thinkers have ` +
-    `to figure out to get here? Make the student feel that this topic is interesting and worth understanding, ` +
-    `not just worth memorising. Use natural spoken transitions throughout: "Now,", "Think about it this way,", ` +
-    `"Here is something important,", "Let me show you,", "So,", "Here is the key,". ` +
-    `Do not use asterisks, hyphens, bullet points, dashes, numbered lists, or any markdown formatting. ` +
-    `Use only commas, full stops, colons, semicolons, and question marks.\n\n` +
+    `Write exactly 12 paragraphs. Opening and Foundation — approximately 25 minutes of session time.\n` +
+    `Paragraph 1: Warm personal greeting. Tell the student what today's topic is and why it matters.\n` +
+    `Paragraph 2: Connect today's topic to something the student already knows from real life in Nigeria.\n` +
+    `Paragraph 3: Give the historical or scientific context — how did humans discover or develop this idea?\n` +
+    `Paragraph 4: Define the topic precisely. Explain every key term clearly the first time you use it.\n` +
+    `Paragraph 5: Explain the first foundational idea within this topic in full.\n` +
+    `Paragraph 6: Deepen that first idea — what follows from it? What does it mean in practice?\n` +
+    `Paragraph 7: Introduce the second foundational idea and explain it fully.\n` +
+    `Paragraph 8: Connect the first and second foundational ideas to each other explicitly.\n` +
+    `Paragraph 9: Give a real-world or Nigerian example that makes both foundational ideas vivid and memorable.\n` +
+    `Paragraph 10: Address the most common confusion students have at this stage. Resolve it clearly.\n` +
+    `Paragraph 11: Explain why understanding this foundation properly makes the rest of the topic easy.\n` +
+    `Paragraph 12: Summarise the foundation in a way that sets up Section 2. Build anticipation.\n\n` +
 
     `## CHECK 1\n` +
-    `A reflective question the student must write a full answer to in their notebook before continuing. ` +
-    `It should take 3 to 5 minutes. Ask them to explain the foundation in their own words or connect it ` +
-    `to something familiar. Make it feel like a natural pause, not a test. No markdown.\n\n` +
-
-    `## SECTION 2\n` +
-    `Core Concept and Worked Examples (approximately 35 minutes of session time).\n` +
-    `Write at least 9 substantial paragraphs. This is the heart of the lesson. Go deep. ` +
-    `Explain the central idea of this topic with complete precision. Do not assume the student understood ` +
-    `from Section 1 — build on it, but re-anchor every new idea to what came before. ` +
-    `Then walk through at least two fully worked examples, step by step, narrating your thinking out loud ` +
-    `as you solve them: "The first thing I do is...", "Notice here that...", "Now some students would ` +
-    `make the mistake of... but here is why that is wrong...". ` +
-    `After the examples, push the student further: what happens in the edge cases? ` +
-    `What variations of this concept show up and how do you recognise them? ` +
-    `Keep the personal, direct voice throughout. No markdown.\n\n` +
-
-    `## CHECK 2\n` +
-    `A more demanding question that requires the student to apply the core concept themselves. ` +
-    `Give them a specific scenario or problem and ask them to work through it in their notebook. ` +
-    `This should take 5 to 8 minutes. Tell them what a complete answer would look like. No markdown.\n\n` +
-
-    `## SECTION 3\n` +
-    `Exam Strategy, Patterns, and Common Mistakes (approximately 30 minutes of session time).\n` +
-    `Write at least 8 substantial paragraphs. Now shift to the exam room. ` +
-    `Walk the student through exactly how this topic is tested in Post-UTME and OAU entrance exams. ` +
-    `Describe at least three specific question types or patterns you have seen repeatedly, and for each one, ` +
-    `explain what the question looks like, what the examiner is actually testing, and what the correct ` +
-    `approach is. Then name the exact mistakes most students make on this topic, explain precisely why ` +
-    `they make them, and show the student how to avoid each one. Be specific. Say things like: ` +
-    `"Every year students lose marks on this because...", "When you see a question that starts with..., ` +
-    `your first move should be...", "The trap here is... and here is how to see through it...". ` +
-    `Make the student feel that they now know something other students do not know. No markdown.\n\n` +
-
-    `## CHECK 3\n` +
-    `Give the student an exam-style question on this topic. Ask them to solve it fully in their notebook ` +
-    `as if they are in the exam hall, then explain their reasoning. ` +
-    `This should take 5 to 10 minutes. After they answer, tell them what the model answer would include. ` +
+    `One reflective question the student writes a full answer to in their notebook (3 to 5 minutes). ` +
+    `Ask them to explain the foundation in their own words and connect it to the Nigerian example you gave. ` +
     `No markdown.\n\n` +
 
+    `## SECTION 2\n` +
+    `Write exactly 15 paragraphs. Core Concept and Worked Examples — approximately 35 minutes.\n` +
+    `Paragraph 1: Transition from Section 1. Tell the student you are now going into the core of the topic.\n` +
+    `Paragraph 2: State the central concept of this topic precisely and completely.\n` +
+    `Paragraph 3: Explain the logic behind the central concept — why does it work this way?\n` +
+    `Paragraph 4: Show how the central concept connects back to the foundation from Section 1.\n` +
+    `Paragraph 5: Introduce Worked Example 1. Set the scene and state the problem clearly.\n` +
+    `Paragraph 6: Walk through the first steps of Worked Example 1, narrating your thinking aloud.\n` +
+    `Paragraph 7: Complete Worked Example 1. Explain what the answer means and why it makes sense.\n` +
+    `Paragraph 8: Name the mistake most students make on problems like Worked Example 1 and explain why it is wrong.\n` +
+    `Paragraph 9: Introduce Worked Example 2 — a different variation of the same concept.\n` +
+    `Paragraph 10: Walk through Worked Example 2 step by step, emphasising what is different from Example 1.\n` +
+    `Paragraph 11: Complete Worked Example 2 and draw out the lesson from comparing both examples.\n` +
+    `Paragraph 12: Discuss the edge cases and variations of the central concept the student must know.\n` +
+    `Paragraph 13: Explain what happens when the central concept is combined with other ideas the student knows.\n` +
+    `Paragraph 14: Give one more brief example that tests whether the student has really understood.\n` +
+    `Paragraph 15: Consolidate Section 2. What are the two or three things the student must now have mastered?\n\n` +
+
+    `## CHECK 2\n` +
+    `One demanding question with a specific scenario or problem the student works through in their notebook ` +
+    `(5 to 8 minutes). Tell them what a complete answer must include. No markdown.\n\n` +
+
+    `## SECTION 3\n` +
+    `Write exactly 12 paragraphs. Exam Strategy, Patterns, and Mistakes — approximately 25 minutes.\n` +
+    `Paragraph 1: Shift tone. Tell the student you are now going to show them how OAU actually tests this.\n` +
+    `Paragraph 2: Describe Exam Pattern 1 — what the question looks like and what it is testing.\n` +
+    `Paragraph 3: Show the exact approach to Exam Pattern 1, step by step.\n` +
+    `Paragraph 4: Describe Exam Pattern 2 — a different question type on the same topic.\n` +
+    `Paragraph 5: Show the exact approach to Exam Pattern 2 and how it differs from Pattern 1.\n` +
+    `Paragraph 6: Describe Exam Pattern 3 — often a trick or combined question OAU loves to set.\n` +
+    `Paragraph 7: Show how to see through Exam Pattern 3 and approach it without panicking.\n` +
+    `Paragraph 8: Name Student Mistake 1 — the most common error on this topic. Explain exactly why students make it.\n` +
+    `Paragraph 9: Show the student precisely how to avoid Mistake 1.\n` +
+    `Paragraph 10: Name Student Mistake 2 — the second most common error. Explain it with a concrete example.\n` +
+    `Paragraph 11: Show how to avoid Mistake 2 and the habit of mind that prevents it.\n` +
+    `Paragraph 12: Give the student one clear mental strategy they can use in the exam room for this topic.\n\n` +
+
+    `## CHECK 3\n` +
+    `Give the student a real OAU-style exam question on this topic. Ask them to solve it fully in their ` +
+    `notebook under exam conditions (5 to 10 minutes), then explain their reasoning step by step. ` +
+    `After they answer, tell them exactly what the model answer includes. No markdown.\n\n` +
+
     `## SECTION 4\n` +
-    `Advanced Depth and Consolidation (approximately 20 minutes of session time).\n` +
-    `Write at least 6 substantial paragraphs. Push beyond what most students study. ` +
-    `Introduce one or two higher-level ideas connected to this topic that OAU specifically tends to test ` +
-    `at a deeper level than other Post-UTME institutions. Work through one challenging example that ` +
-    `combines this topic with something the student has already learned. ` +
-    `Then close the session with energy: remind the student what they have covered today, ` +
-    `why it is significant, and how it connects to what comes next. ` +
-    `Begin the final paragraph with "Key takeaway:" and give one clear, memorable statement of the ` +
-    `single most important principle from today. End with a sentence that makes the student feel ` +
-    `genuinely ready and confident. No markdown.\n\n` +
+    `Write exactly 11 paragraphs. Advanced Depth and Consolidation — approximately 20 minutes.\n` +
+    `Paragraph 1: Tell the student you are now going beyond what most Post-UTME students study.\n` +
+    `Paragraph 2: Introduce one advanced idea connected to today's topic that OAU tests at a higher level.\n` +
+    `Paragraph 3: Explain that advanced idea thoroughly and show why it is not as hard as it looks.\n` +
+    `Paragraph 4: Connect the advanced idea back to the core concept from Section 2.\n` +
+    `Paragraph 5: Walk through one challenging combined example that tests deep understanding.\n` +
+    `Paragraph 6: Explain the solution to the combined example, emphasising the reasoning not just the steps.\n` +
+    `Paragraph 7: Connect today's topic explicitly to what the student has already learned in previous lessons.\n` +
+    `Paragraph 8: Tell the student what topic comes next and how today's lesson prepares them for it.\n` +
+    `Paragraph 9: Summarise the entire session — what were the four or five biggest ideas covered today?\n` +
+    `Paragraph 10: Begin with "Key takeaway:" — one precise, memorable statement of today's most important principle.\n` +
+    `Paragraph 11: End with genuine encouragement. Make the student feel capable, prepared, and motivated.\n\n` +
 
     `## CLASSWORK\n` +
-    `A two-part in-class exercise the student completes before leaving today's session. ` +
-    `Part A: a direct application question testing the core concept from Section 2 (5 to 8 minutes). ` +
-    `Part B: an interpretation or analysis question that requires the student to think, not just recall ` +
-    `(7 to 10 minutes). Write both parts in full. No bullet points or markdown. ` +
-    `End with: [Rubric: what a complete classwork answer must show for both parts]\n\n` +
+    `A two-part in-class exercise completed before leaving today's session.\n` +
+    `Part A (5 to 8 minutes): A direct application question testing the central concept from Section 2.\n` +
+    `Part B (8 to 12 minutes): An analysis or interpretation question requiring real thinking, not recall.\n` +
+    `Write both parts in full as complete questions. No bullet points or markdown.\n` +
+    `End with: [Rubric: what a complete answer to Part A and Part B must each show]\n\n` +
 
     `## ASSIGNMENT\n` +
-    `A substantial take-home assignment with three parts. ` +
-    `Part A: a problem that applies today's concept in a new context not covered in the lesson. ` +
-    `Part B: a research or explanation task that requires the student to go beyond the session material. ` +
-    `Part C: a reflection question asking the student to connect today's topic to a past Post-UTME question ` +
-    `or real-world situation they know about. ` +
-    `A serious student should spend 25 to 35 minutes on this. Write all three parts in full. ` +
-    `No bullet points or markdown. ` +
-    `End with: [Rubric: what a complete assignment answer must show for each part]`;
+    `A three-part take-home assignment requiring 25 to 35 minutes of serious work.\n` +
+    `Part A: Apply today's concept in a new context not covered in the lesson.\n` +
+    `Part B: A deeper research or explanation task that goes beyond today's session material.\n` +
+    `Part C: Connect today's topic to a real past Post-UTME question or real-world situation in Nigeria.\n` +
+    `Write all three parts in full as complete questions. No bullet points or markdown.\n` +
+    `End with: [Rubric: what a complete answer to Part A, Part B, and Part C must each show]`;
 
   const resp = await (claudeClient as any).messages.create({
     model: CONFIG.model,
