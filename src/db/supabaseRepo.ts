@@ -88,13 +88,14 @@ export async function getCurriculumDay(
   dayNumber: number,
 ): Promise<CurriculumDay | null> {
   await ensureSeeded();
-  const { data } = await sb
+  const { data, error } = await sb
     .from('tutor_curriculum')
     .select('*')
     .eq('department', department)
     .eq('subject', subject)
     .eq('day_number', dayNumber)
     .maybeSingle();
+  if (error) throw new Error(`Curriculum lookup failed: ${error.message}`);
   return (data as CurriculumDay) ?? null;
 }
 

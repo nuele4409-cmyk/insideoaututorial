@@ -370,7 +370,13 @@ app.post(
     const last = await repo.getLastLesson(subject, department);
     const dayNumber = last ? last.day_number + 1 : 1;
     const curriculum = await repo.getCurriculumDay(POSTUTME_DEPT, subject, dayNumber);
-    const topic = curriculum?.topic || `Introduction to ${subject.charAt(0).toUpperCase() + subject.slice(1)}`;
+    if (!curriculum) {
+      res.status(400).json({
+        error: `No curriculum found for ${subject} Day ${dayNumber}. Upload your outline CSV first via the 📚 Outlines panel.`,
+      });
+      return;
+    }
+    const topic = curriculum.topic;
 
     const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     const lessonContent =
