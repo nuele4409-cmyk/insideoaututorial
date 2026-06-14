@@ -9,7 +9,7 @@ export const CONFIG = {
 
   // Claude
   anthropicApiKey: process.env.ANTHROPIC_API_KEY?.trim() ?? '',
-  model: process.env.ANTHROPIC_MODEL?.trim() || 'claude-opus-4-8',
+  model: process.env.ANTHROPIC_MODEL?.trim() || 'claude-sonnet-4-6',
   maxTokens: 1500,
 
   // Gemini (free tier alternative)
