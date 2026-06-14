@@ -49,12 +49,9 @@ export interface Track {
 
 // Mathematics appears in both science and arts_commercial — each track tracks
 // its own day-number progression independently.
+// English, Commerce, and Accounting are excluded: English is taught via WhatsApp
+// group; Commerce and Accounting are not offered in this programme.
 export const TRACKS: Track[] = [
-  {
-    key: 'general',
-    label: 'General',
-    subjects: ['english'],
-  },
   {
     key: 'science',
     label: 'Track A — Sciences',
@@ -63,7 +60,7 @@ export const TRACKS: Track[] = [
   {
     key: 'arts_commercial',
     label: 'Track B — Arts & Commercial',
-    subjects: ['economics', 'government', 'literature', 'commerce', 'accounting', 'crs', 'irs', 'mathematics'],
+    subjects: ['economics', 'government', 'literature', 'crs', 'irs', 'mathematics'],
   },
 ];
 
