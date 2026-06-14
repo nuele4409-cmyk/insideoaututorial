@@ -588,37 +588,46 @@ body.s-dark {
 /* ── Mobile (≤ 480px) ─────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
 
-  /* Topbar */
+  /* Topbar — 2-row layout: brand on top, admin buttons scroll below */
   .topbar {
-    padding: 10px 14px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 14px 8px;
     gap: 8px;
   }
-  .brand-mark { width: 38px; height: 38px; font-size: 20px; border-radius: 10px; }
-  .brand-text h1 { font-size: 17px; }
-  .brand-text p  { font-size: 11px; }
+  .brand { gap: 10px; }
+  .brand-mark { width: 36px; height: 36px; font-size: 18px; border-radius: 10px; flex-shrink: 0; }
+  .brand-text h1 { font-size: 16px; }
+  .brand-text p  { display: none; } /* hide subtitle — saves space */
   .topbar-right {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    flex: 1;
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-  .admin-btn {
-    font-size: 11px;
-    padding: 5px 10px;
-  }
+  .topbar-right::-webkit-scrollbar { display: none; }
+  .admin-btn { font-size: 12px; padding: 7px 13px; white-space: nowrap; flex-shrink: 0; }
 
-  /* Login */
-  .login-overlay { padding: 16px; align-items: flex-end; }
-  .login-box {
-    border-radius: 20px 20px 16px 16px;
-    padding: 26px 20px 32px;
-    max-width: 100%;
+  /* Login — proper center with subtle glow */
+  .login-overlay {
+    padding: 24px 16px;
+    align-items: center;
+    justify-content: center;
   }
-  .login-brand h1 { font-size: 20px; }
-  .auth-input { font-size: 16px; padding: 13px 14px; }
-  .login-btn { padding: 14px; font-size: 15px; }
+  .login-box {
+    border-radius: 20px;
+    padding: 28px 20px 28px;
+    max-width: 100%;
+    box-shadow: 0 0 0 1px var(--brd), 0 24px 80px rgba(0,0,0,0.6), 0 0 60px rgba(139,92,246,0.12);
+  }
+  .login-brand { margin-bottom: 8px; }
+  .login-brand h1 { font-size: 22px; }
+  .login-sub { font-size: 13px; margin-bottom: 20px; }
+  .auth-input { font-size: 16px; padding: 13px 14px; margin-bottom: 10px; }
+  .login-btn { padding: 14px; font-size: 15px; border-radius: 14px; }
 
   /* Layout */
   .layout { padding: 10px 10px 24px; gap: 12px; }
