@@ -278,6 +278,9 @@ export async function getSubmissionFileUrl(_path: string): Promise<string> {
 export async function resetAllLessons(): Promise<number> {
   throw new Error(GROUP_CLASS_ERR);
 }
+export async function resetSubjectLessons(_subject: string, _department: string): Promise<number> {
+  throw new Error(GROUP_CLASS_ERR);
+}
 
 // ── Announcements ────────────────────────────────────────────────────────────
 

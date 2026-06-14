@@ -962,7 +962,7 @@ function renderClassByTrack(tracks) {
       }
 
       const btnWrap = document.createElement('div');
-      btnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0;';
+      btnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;';
 
       const btn = document.createElement('button');
       btn.className = s.day_number ? 'btn btn-secondary btn-sm' : 'btn btn-accent btn-sm';
@@ -975,8 +975,16 @@ function renderClassByTrack(tracks) {
       demoBtn.title = 'Insert a demo lesson — no AI tokens used';
       demoBtn.addEventListener('click', () => seedDemoLesson(s.subject, track.key, demoBtn, meta));
 
+      const clearBtn = document.createElement('button');
+      clearBtn.className = 'btn btn-sm';
+      clearBtn.style.cssText = 'background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);';
+      clearBtn.textContent = '🗑';
+      clearBtn.title = `Clear all ${s.label || s.subject} lessons — next Generate/Demo starts from Day 1`;
+      clearBtn.addEventListener('click', () => clearSubjectLessons(s.subject, track.key, clearBtn, meta, btn));
+
       btnWrap.appendChild(btn);
       btnWrap.appendChild(demoBtn);
+      btnWrap.appendChild(clearBtn);
       row.appendChild(info);
       row.appendChild(btnWrap);
       list.appendChild(row);
@@ -1022,6 +1030,30 @@ async function seedDemoLesson(subject, department, btn, metaEl) {
     btn.disabled = false;
     btn.textContent = '🧪 Demo';
     $('classModalMsg').textContent = '⚠ ' + e.message;
+  }
+}
+
+async function clearSubjectLessons(subject, department, clearBtn, metaEl, generateBtn) {
+  const label = cap(subject);
+  if (!confirm(`Clear all ${label} lessons?\n\nThis resets ${label} back to Day 1. The next Generate or Demo will start fresh.\n\nYour uploaded CSV outline is NOT affected.`)) return;
+  clearBtn.disabled = true;
+  clearBtn.textContent = '…';
+  $('classModalMsg').textContent = '';
+  try {
+    const data = await api('/api/admin/reset-subject', {
+      method: 'DELETE',
+      body: JSON.stringify({ subject, department }),
+    });
+    metaEl.textContent = 'No class yet today';
+    generateBtn.className = 'btn btn-accent btn-sm';
+    generateBtn.textContent = 'Generate';
+    $('classModalMsg').textContent = `✅ ${label} cleared (${data.deleted} lesson${data.deleted !== 1 ? 's' : ''} removed). Ready to start from Day 1.`;
+    if (state.subject === subject && state.subjectDept === department) await loadClassroom();
+  } catch (e) {
+    $('classModalMsg').textContent = '⚠ ' + e.message;
+  } finally {
+    clearBtn.disabled = false;
+    clearBtn.textContent = '🗑';
   }
 }
 

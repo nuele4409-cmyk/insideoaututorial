@@ -649,6 +649,25 @@ app.delete(
   }),
 );
 
+// Admin: delete all lesson records for ONE subject so next generate starts from Day 1.
+app.delete(
+  '/api/admin/reset-subject',
+  wrap(async (req, res) => {
+    if (!(await requireAdmin(req))) {
+      res.status(403).json({ error: 'Admin only.' });
+      return;
+    }
+    const subject = String(req.body?.subject ?? '').trim().toLowerCase();
+    const department = String(req.body?.department ?? '').trim().toLowerCase();
+    if (!subject || !department) {
+      res.status(400).json({ error: 'subject and department are required.' });
+      return;
+    }
+    const deleted = await repo.resetSubjectLessons(subject, department);
+    res.json({ deleted });
+  }),
+);
+
 // ── Static web client ────────────────────────────────────────────────────────
 
 app.use(express.static(CONFIG.publicDir));

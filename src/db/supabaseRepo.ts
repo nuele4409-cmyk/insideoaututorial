@@ -350,18 +350,35 @@ export async function getLessonStatus(date: string) {
 }
 
 export async function resetAllLessons(): Promise<number> {
-  // Count first so we can report how many were deleted
   const { count, error: countErr } = await sb
     .from('tutor_daily_lessons')
     .select('id', { count: 'exact', head: true });
   if (countErr) throw new Error(countErr.message);
   const total = count ?? 0;
   if (total > 0) {
-    // day_number is an integer column always >= 1 — safe universal filter for UUID-keyed table
     const { error } = await sb
       .from('tutor_daily_lessons')
       .delete()
       .gt('day_number', 0);
+    if (error) throw new Error(error.message);
+  }
+  return total;
+}
+
+export async function resetSubjectLessons(subject: string, department: string): Promise<number> {
+  const { count, error: countErr } = await sb
+    .from('tutor_daily_lessons')
+    .select('id', { count: 'exact', head: true })
+    .eq('subject', subject)
+    .eq('department', department);
+  if (countErr) throw new Error(countErr.message);
+  const total = count ?? 0;
+  if (total > 0) {
+    const { error } = await sb
+      .from('tutor_daily_lessons')
+      .delete()
+      .eq('subject', subject)
+      .eq('department', department);
     if (error) throw new Error(error.message);
   }
   return total;
