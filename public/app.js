@@ -893,6 +893,14 @@ function renderClassByTrack(tracks) {
         : 'No class yet today';
       info.appendChild(meta);
 
+      // Next lesson from curriculum (shows that CSV is loaded)
+      if (s.nextTopic) {
+        const next = document.createElement('span');
+        next.className = 'class-subject-next';
+        next.textContent = `📚 Next: Day ${s.nextDay} · ${s.nextTopic}`;
+        info.appendChild(next);
+      }
+
       const btnWrap = document.createElement('div');
       btnWrap.style.cssText = 'display:flex;gap:6px;flex-shrink:0;';
 

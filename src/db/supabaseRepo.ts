@@ -15,7 +15,7 @@ import type {
   Submission,
   TutorQuestion,
 } from '../types';
-import { TRACKS, subjectLabel } from '../subjects';
+import { POSTUTME_DEPT, TRACKS, subjectLabel } from '../subjects';
 
 const key = CONFIG.cbt.serviceRoleKey || CONFIG.cbt.anonKey;
 const sb = createClient(CONFIG.cbt.url, key, {
@@ -285,6 +285,7 @@ export async function getLessonStatus(date: string) {
   for (const track of TRACKS) {
     const trackSubjects = [];
     for (const subject of track.subjects) {
+      // ── Today's lesson (if any) ──────────────────────────────────────
       const { data: lesson } = await sb
         .from('tutor_daily_lessons')
         .select('day_number, topic')
@@ -293,8 +294,28 @@ export async function getLessonStatus(date: string) {
         .eq('lesson_date', date)
         .maybeSingle();
 
+      // ── Next lesson preview from curriculum ──────────────────────────
+      // Find the highest lesson day ever generated, then look up that next day in curriculum.
+      const { data: lastRows } = await sb
+        .from('tutor_daily_lessons')
+        .select('day_number')
+        .eq('subject', subject)
+        .eq('department', track.key)
+        .order('day_number', { ascending: false })
+        .limit(1);
+      const lastDayNum: number = (lastRows?.[0] as any)?.day_number ?? 0;
+      const nextDayNum = lastDayNum + 1;
+      const { data: nextCurr } = await sb
+        .from('tutor_curriculum')
+        .select('topic')
+        .eq('department', POSTUTME_DEPT)
+        .eq('subject', subject)
+        .eq('day_number', nextDayNum)
+        .maybeSingle();
+      const nextTopic: string | null = (nextCurr as any)?.topic ?? null;
+
       if (!lesson) {
-        trackSubjects.push({ subject, label: subjectLabel(subject) });
+        trackSubjects.push({ subject, label: subjectLabel(subject), nextDay: nextDayNum, nextTopic });
         continue;
       }
 
@@ -318,6 +339,8 @@ export async function getLessonStatus(date: string) {
         topic: (lesson as any).topic,
         submitted: submitted ?? 0,
         graded: graded ?? 0,
+        nextDay: nextDayNum,
+        nextTopic,
       });
     }
     result.push({ key: track.key, label: track.label, subjects: trackSubjects });
