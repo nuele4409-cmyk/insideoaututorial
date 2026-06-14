@@ -422,7 +422,7 @@ app.post(
 
     const lesson = await repo.saveDailyLesson({
       subject, department, day_number: dayNumber, topic,
-      lesson_content: lessonContent,
+      lesson_content: '[DEMO]\n' + lessonContent,
       classwork_prompt: classworkPrompt,
       assignment_prompt: assignmentPrompt,
       lesson_date: date,
@@ -646,6 +646,37 @@ app.delete(
     }
     const deleted = await repo.resetAllLessons();
     res.json({ deleted });
+  }),
+);
+
+// Admin: delete today's lesson for a subject — only if it is a demo (not a live AI lesson).
+app.delete(
+  '/api/admin/reset-demo',
+  wrap(async (req, res) => {
+    if (!(await requireAdmin(req))) {
+      res.status(403).json({ error: 'Admin only.' });
+      return;
+    }
+    const subject = String(req.body?.subject ?? '').trim().toLowerCase();
+    const department = String(req.body?.department ?? '').trim().toLowerCase();
+    if (!subject || !department) {
+      res.status(400).json({ error: 'subject and department are required.' });
+      return;
+    }
+    const date = todayWAT();
+    const lesson = await repo.getTodayLesson(subject, department, date);
+    if (!lesson) {
+      res.status(404).json({ error: 'No lesson for this subject today.' });
+      return;
+    }
+    if (!lesson.lesson_content.startsWith('[DEMO]')) {
+      res.status(400).json({
+        error: 'Today\'s lesson is a live AI lesson — use 🗑 to fully reset this subject.',
+      });
+      return;
+    }
+    await repo.resetTodayLesson(subject, department, date);
+    res.json({ ok: true });
   }),
 );
 

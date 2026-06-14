@@ -365,6 +365,17 @@ export async function resetAllLessons(): Promise<number> {
   return total;
 }
 
+export async function resetTodayLesson(subject: string, department: string, date: string): Promise<boolean> {
+  const { error } = await sb
+    .from('tutor_daily_lessons')
+    .delete()
+    .eq('subject', subject)
+    .eq('department', department)
+    .eq('lesson_date', date);
+  if (error) throw new Error(error.message);
+  return true;
+}
+
 export async function resetSubjectLessons(subject: string, department: string): Promise<number> {
   const { count, error: countErr } = await sb
     .from('tutor_daily_lessons')

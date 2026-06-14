@@ -975,15 +975,23 @@ function renderClassByTrack(tracks) {
       demoBtn.title = 'Insert a demo lesson — no AI tokens used';
       demoBtn.addEventListener('click', () => seedDemoLesson(s.subject, track.key, demoBtn, meta));
 
+      const clearDemoBtn = document.createElement('button');
+      clearDemoBtn.className = 'btn btn-sm';
+      clearDemoBtn.style.cssText = 'background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);';
+      clearDemoBtn.textContent = '✕ Demo';
+      clearDemoBtn.title = `Clear today's demo for ${s.label || s.subject} — safe, won't touch a real lesson`;
+      clearDemoBtn.addEventListener('click', () => clearDemoLesson(s.subject, track.key, clearDemoBtn, meta, btn));
+
       const clearBtn = document.createElement('button');
       clearBtn.className = 'btn btn-sm';
       clearBtn.style.cssText = 'background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);';
       clearBtn.textContent = '🗑';
-      clearBtn.title = `Clear all ${s.label || s.subject} lessons — next Generate/Demo starts from Day 1`;
+      clearBtn.title = `Clear ALL ${s.label || s.subject} lessons — resets to Day 1`;
       clearBtn.addEventListener('click', () => clearSubjectLessons(s.subject, track.key, clearBtn, meta, btn));
 
       btnWrap.appendChild(btn);
       btnWrap.appendChild(demoBtn);
+      btnWrap.appendChild(clearDemoBtn);
       btnWrap.appendChild(clearBtn);
       row.appendChild(info);
       row.appendChild(btnWrap);
@@ -1030,6 +1038,28 @@ async function seedDemoLesson(subject, department, btn, metaEl) {
     btn.disabled = false;
     btn.textContent = '🧪 Demo';
     $('classModalMsg').textContent = '⚠ ' + e.message;
+  }
+}
+
+async function clearDemoLesson(subject, department, btn, metaEl, generateBtn) {
+  btn.disabled = true;
+  btn.textContent = '…';
+  $('classModalMsg').textContent = '';
+  try {
+    await api('/api/admin/reset-demo', {
+      method: 'DELETE',
+      body: JSON.stringify({ subject, department }),
+    });
+    metaEl.textContent = 'No class yet today';
+    generateBtn.className = 'btn btn-accent btn-sm';
+    generateBtn.textContent = 'Generate';
+    $('classModalMsg').textContent = `✅ Demo cleared for ${cap(subject)}. Click 🧪 Demo or Generate to start fresh.`;
+    if (state.subject === subject && state.subjectDept === department) await loadClassroom();
+  } catch (e) {
+    $('classModalMsg').textContent = '⚠ ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✕ Demo';
   }
 }
 

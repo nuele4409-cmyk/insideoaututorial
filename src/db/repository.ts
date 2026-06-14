@@ -281,6 +281,9 @@ export async function resetAllLessons(): Promise<number> {
 export async function resetSubjectLessons(_subject: string, _department: string): Promise<number> {
   throw new Error(GROUP_CLASS_ERR);
 }
+export async function resetTodayLesson(_subject: string, _department: string, _date: string): Promise<boolean> {
+  throw new Error(GROUP_CLASS_ERR);
+}
 
 // ── Announcements ────────────────────────────────────────────────────────────
 
