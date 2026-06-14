@@ -60,7 +60,7 @@ export const TRACKS: Track[] = [
   {
     key: 'arts_commercial',
     label: 'Track B — Arts & Commercial',
-    subjects: ['economics', 'government', 'literature', 'crs', 'irs', 'mathematics'],
+    subjects: ['economics', 'government', 'literature', 'crs', 'mathematics'],
   },
 ];
 
