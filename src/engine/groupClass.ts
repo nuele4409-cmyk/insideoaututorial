@@ -1,5 +1,5 @@
 import { CONFIG } from '../config';
-import { generateLesson, gradeSubmissions } from '../anthropic/groupLesson';
+import { generateLesson } from '../anthropic/groupLesson';
 import { repo } from '../db';
 import { POSTUTME_DEPT } from '../subjects';
 import type { DailyLesson, Submission } from '../types';

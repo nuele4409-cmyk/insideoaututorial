@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { CONFIG, HAS_LIVE_CLAUDE } from '../config';
-import type { CurriculumDay, GradeResult } from '../types';
+import type { CurriculumDay } from '../types';
 
 const claudeClient = HAS_LIVE_CLAUDE ? new Anthropic({ apiKey: CONFIG.anthropicApiKey }) : null;
 
@@ -18,8 +18,8 @@ export async function generateLesson(
 
   const prompt =
     `You are a brilliant, warm, and deeply experienced Nigerian lecturer running an intensive one-on-one ` +
-    `Post-UTME tutorial session. You know OAU's exam style inside out. You are thorough, you love your ` +
-    `subject, and you refuse to let a student leave without genuinely understanding every idea taught today.\n\n` +
+    `Post-UTME tutorial session. You know Post-UTME exam patterns across all institutions inside out. ` +
+    `You are thorough, you love your subject, and you refuse to let a student leave without genuinely understanding every idea taught today.\n\n` +
     `Subject: ${subject.toUpperCase()}, Day ${curriculum.day_number}: "${curriculum.topic}"\n` +
     `Curriculum guide: ${curriculum.outline}\n\n` +
     `PARAGRAPH COUNT REQUIREMENT: This lesson must contain exactly 50 teaching paragraphs in total across ` +
@@ -78,12 +78,12 @@ export async function generateLesson(
 
     `## SECTION 3\n` +
     `Write exactly 12 paragraphs. Exam Strategy, Patterns, and Mistakes — approximately 25 minutes.\n` +
-    `Paragraph 1: Shift tone. Tell the student you are now going to show them how OAU actually tests this.\n` +
+    `Paragraph 1: Shift tone. Tell the student you are now going to show them how Post-UTME institutions actually test this topic.\n` +
     `Paragraph 2: Describe Exam Pattern 1 — what the question looks like and what it is testing.\n` +
     `Paragraph 3: Show the exact approach to Exam Pattern 1, step by step.\n` +
     `Paragraph 4: Describe Exam Pattern 2 — a different question type on the same topic.\n` +
     `Paragraph 5: Show the exact approach to Exam Pattern 2 and how it differs from Pattern 1.\n` +
-    `Paragraph 6: Describe Exam Pattern 3 — often a trick or combined question OAU loves to set.\n` +
+    `Paragraph 6: Describe Exam Pattern 3 — often a trick or combined question institutions love to set.\n` +
     `Paragraph 7: Show how to see through Exam Pattern 3 and approach it without panicking.\n` +
     `Paragraph 8: Name Student Mistake 1 — the most common error on this topic. Explain exactly why students make it.\n` +
     `Paragraph 9: Show the student precisely how to avoid Mistake 1.\n` +
@@ -92,14 +92,14 @@ export async function generateLesson(
     `Paragraph 12: Give the student one clear mental strategy they can use in the exam room for this topic.\n\n` +
 
     `## CHECK 3\n` +
-    `Give the student a real OAU-style exam question on this topic. Ask them to solve it fully in their ` +
+    `Give the student a real Post-UTME-style exam question on this topic. Ask them to solve it fully in their ` +
     `notebook under exam conditions (5 to 10 minutes), then explain their reasoning step by step. ` +
     `After they answer, tell them exactly what the model answer includes. No markdown.\n\n` +
 
     `## SECTION 4\n` +
     `Write exactly 11 paragraphs. Advanced Depth and Consolidation — approximately 20 minutes.\n` +
     `Paragraph 1: Tell the student you are now going beyond what most Post-UTME students study.\n` +
-    `Paragraph 2: Introduce one advanced idea connected to today's topic that OAU tests at a higher level.\n` +
+    `Paragraph 2: Introduce one advanced idea connected to today's topic that Post-UTME institutions test at a higher level.\n` +
     `Paragraph 3: Explain that advanced idea thoroughly and show why it is not as hard as it looks.\n` +
     `Paragraph 4: Connect the advanced idea back to the core concept from Section 2.\n` +
     `Paragraph 5: Walk through one challenging combined example that tests deep understanding.\n` +
@@ -149,49 +149,3 @@ export async function generateLesson(
   };
 }
 
-export async function gradeSubmissions(
-  subject: string,
-  dayNumber: number,
-  topic: string,
-  assignmentPrompt: string,
-  submissions: { student_id: string; submission_text: string }[],
-): Promise<GradeResult[]> {
-  if (!claudeClient) throw new Error('No Claude API key configured — set ANTHROPIC_API_KEY.');
-  if (!submissions.length) return [];
-
-  const studentList = submissions
-    .map((s, i) => `${i + 1}. ID: ${s.student_id}\n${s.submission_text}`)
-    .join('\n\n---\n\n');
-
-  const prompt =
-    `Grade these student assignment responses.\n` +
-    `Subject: ${subject.toUpperCase()} — Day ${dayNumber}: "${topic}"\n` +
-    `Assignment: "${assignmentPrompt}"\n\n` +
-    `Score each 0–10. Be strict: 10 = exceptional, 7–8 = good, 5–6 = adequate, below 5 = weak.\n\n` +
-    `Return ONLY a valid JSON array — no markdown fences, no extra text:\n` +
-    `[{"student_id":"IOAU-xxxx","score":7,"feedback":"Direct 2-sentence feedback."}]\n\n` +
-    `Student responses:\n${studentList}`;
-
-  const resp = await (claudeClient as any).messages.create({
-    model: CONFIG.model,
-    max_tokens: 2000,
-    messages: [{ role: 'user', content: prompt }],
-  });
-
-  let text = '';
-  for (const block of resp.content as any[]) {
-    if (block.type === 'text') text += block.text;
-  }
-
-  const clean = text.replace(/```json?\s*/gi, '').replace(/```\s*/gi, '').trim();
-  try {
-    const parsed = JSON.parse(clean);
-    return (Array.isArray(parsed) ? parsed : []).map((r: any) => ({
-      student_id: String(r.student_id ?? ''),
-      score: Math.max(0, Math.min(10, Math.round(Number(r.score) || 0))),
-      feedback: String(r.feedback ?? ''),
-    }));
-  } catch {
-    return [];
-  }
-}
