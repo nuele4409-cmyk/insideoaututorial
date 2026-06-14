@@ -357,6 +357,8 @@ body.s-dark {
   font-family: var(--font);
 }
 .admin-btn:hover { filter: brightness(1.06); }
+.admin-btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.admin-btn-danger:hover { background: rgba(239,68,68,0.25); filter: none; }
 
 .modal-overlay {
   position: fixed; inset: 0; z-index: 120;

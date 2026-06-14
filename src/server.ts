@@ -605,6 +605,19 @@ app.get(
   }),
 );
 
+// Admin: delete all lesson records so next generate starts from Day 1.
+app.delete(
+  '/api/admin/reset-lessons',
+  wrap(async (req, res) => {
+    if (!(await requireAdmin(req))) {
+      res.status(403).json({ error: 'Admin only.' });
+      return;
+    }
+    const deleted = await repo.resetAllLessons();
+    res.json({ deleted });
+  }),
+);
+
 // ── Static web client ────────────────────────────────────────────────────────
 
 app.use(express.static(CONFIG.publicDir));

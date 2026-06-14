@@ -275,6 +275,9 @@ export async function uploadSubmissionFile(_path: string, _buffer: Buffer, _cont
 export async function getSubmissionFileUrl(_path: string): Promise<string> {
   throw new Error(GROUP_CLASS_ERR);
 }
+export async function resetAllLessons(): Promise<number> {
+  throw new Error(GROUP_CLASS_ERR);
+}
 
 // ── Announcements ────────────────────────────────────────────────────────────
 

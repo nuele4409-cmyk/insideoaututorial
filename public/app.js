@@ -813,6 +813,7 @@ async function enterAsStudent(data) {
     $('adminClassBtn').hidden = false;
     $('adminGradeBtn').hidden = false;
     $('adminQuestionsBtn').hidden = false;
+    $('adminResetBtn').hidden = false;
   }
 
   await loadClassroom();
@@ -1262,6 +1263,30 @@ function uploadOutlines() {
   });
 }
 
+async function resetAllLessons() {
+  if (!confirm(
+    '⚠️ Reset ALL lessons?\n\n' +
+    'This permanently deletes every lesson record. Students will see no class until you generate or demo Day 1 again.\n\n' +
+    'The curriculum (your uploaded CSV) is NOT affected — Day 1 will use your proper outline topics.\n\n' +
+    'Are you sure?'
+  )) return;
+  const btn = $('adminResetBtn');
+  const prev = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Resetting…';
+  try {
+    const data = await api('/api/admin/reset-lessons', { method: 'DELETE' });
+    alert(`✅ Done — ${data.deleted} lesson record(s) cleared. Click "Open Class" → "Regenerate" or "Demo" to start from Day 1.`);
+    // Reload classroom view so the "no lesson yet" state shows
+    if (typeof loadClassroom === 'function') await loadClassroom();
+  } catch (e) {
+    alert('⚠ Reset failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prev;
+  }
+}
+
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) =>
@@ -1324,6 +1349,9 @@ function wireEvents() {
   $('adminOutlinesBtn').addEventListener('click', openOutlines);
   $('outlinesClose').addEventListener('click', closeOutlines);
   $('outlinesUploadBtn').addEventListener('click', uploadOutlines);
+
+  // Admin — Reset all lessons
+  $('adminResetBtn').addEventListener('click', resetAllLessons);
 }
 
 init();
