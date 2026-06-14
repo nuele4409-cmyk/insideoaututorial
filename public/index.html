@@ -26,6 +26,18 @@
   />
   <link rel="stylesheet" href="/styles.css?v=8" />
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']],
+        processEscapes: true,
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: false },
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body class="s-dark">
 
@@ -335,6 +347,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=8"></script>
+  <script src="/app.js?v=9"></script>
 </body>
 </html>

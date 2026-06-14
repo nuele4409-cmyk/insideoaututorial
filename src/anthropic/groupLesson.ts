@@ -35,7 +35,12 @@ export async function generateLesson(
     `Address the student as "you" at all times. Use spoken transitions: "Now,", "Think about it this way,", ` +
     `"Here is something important,", "Let me show you,", "So,", "Here is the key,", "Notice this,". ` +
     `Do not use asterisks, hyphens, bullet points, dashes, numbered lists, or any markdown. ` +
-    `Use only commas, full stops, colons, semicolons, and question marks.\n\n` +
+    `Use only commas, full stops, colons, semicolons, and question marks.\n` +
+    `EQUATIONS: For any mathematical expression, formula, or equation, always write it in LaTeX notation. ` +
+    `Wrap inline expressions in single dollar signs: $v^2 = u^2 + 2as$. ` +
+    `Wrap standalone display equations in double dollar signs on their own line: $$E = mc^2$$. ` +
+    `Never write equations as plain text like "v squared equals u squared plus 2as". ` +
+    `Always use LaTeX so the equation renders properly for the student.\n\n` +
     `Use these exact markers on their own lines. Do not rename, skip, or reorder any of them:\n\n` +
 
     `## SECTION 1\n` +

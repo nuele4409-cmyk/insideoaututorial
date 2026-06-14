@@ -257,6 +257,8 @@ async function revealLesson(lesson, instant) {
         appendCheckGate(body, block.text);
       }
     }
+    // Batch-render all equations at once for instant reveal
+    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([body]).catch(() => {});
     return;
   }
 
@@ -287,6 +289,8 @@ function appendPara(container, text, animate) {
   if (animate) p.classList.add('para-reveal');
   p.textContent = text;
   container.appendChild(p);
+  // Render any LaTeX in this paragraph
+  if (window.MathJax?.typesetPromise) MathJax.typesetPromise([p]).catch(() => {});
 }
 
 // ── Checkpoint gates ──────────────────────────────────────────────────────────
@@ -308,6 +312,7 @@ function showCheckpointGate(container, question) {
     });
     container.appendChild(gate);
     gate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([gate]).catch(() => {});
   });
 }
 
