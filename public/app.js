@@ -1048,7 +1048,7 @@ function renderClassByTrack(tracks) {
       schedBtn.className = 'btn btn-secondary btn-sm';
       schedBtn.textContent = '📅 Schedule';
       schedBtn.title = 'Generate lesson now, but set a future date/time for students to see it';
-      schedBtn.addEventListener('click', () => openScheduleDialog(s.subject, track.key, meta));
+      schedBtn.addEventListener('click', () => openScheduleDialog(s.subject, track.key, meta, schedBtn));
 
       btnWrap.appendChild(btn);
       btnWrap.appendChild(schedBtn);
@@ -1149,45 +1149,73 @@ async function clearSubjectLessons(subject, department, clearBtn, metaEl, genera
   }
 }
 
-function openScheduleDialog(subject, department, metaEl) {
+function openScheduleDialog(subject, department, metaEl, schedBtn) {
   const msg = $('classModalMsg');
   const pad = (n) => String(n).padStart(2, '0');
-  // Default to 1 hour from now in local time
   const def = new Date(Date.now() + 3_600_000);
   const defStr = `${def.getFullYear()}-${pad(def.getMonth()+1)}-${pad(def.getDate())}T${pad(def.getHours())}:${pad(def.getMinutes())}`;
-  const inputId = `schedLiveAt_${subject}`;
 
-  msg.innerHTML =
-    `<div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">` +
-    `<span style="color:var(--muted);font-size:.85em;">Go live at (your local time):</span>` +
-    `<input type="datetime-local" id="${inputId}" value="${defStr}" style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:.9em;">` +
-    `<button class="btn btn-accent btn-sm" onclick="confirmScheduleLesson('${subject}','${department}')">Generate &amp; Schedule</button>` +
-    `<button class="btn btn-sm" style="color:var(--muted)" onclick="$('classModalMsg').textContent=''">Cancel</button>` +
-    `</div>`;
-}
+  // Build form with DOM (no inline onclick)
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;';
 
-async function confirmScheduleLesson(subject, department) {
-  const inputId = `schedLiveAt_${subject}`;
-  const input = document.getElementById(inputId);
-  if (!input || !input.value) { $('classModalMsg').textContent = '⚠ Please pick a date and time.'; return; }
+  const label = document.createElement('span');
+  label.style.cssText = 'color:var(--muted);font-size:.85em;';
+  label.textContent = 'Go live at (your local time):';
 
-  const goesLiveAt = new Date(input.value).toISOString();
-  const btns = $('classModalMsg').querySelectorAll('button');
-  btns.forEach((b) => { b.disabled = true; });
+  const input = document.createElement('input');
+  input.type = 'datetime-local';
+  input.value = defStr;
+  input.style.cssText = 'background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:.9em;';
 
-  try {
-    const { lesson, isNew } = await api('/api/lessons/generate', {
-      method: 'POST',
-      body: JSON.stringify({ subject, department, goes_live_at: goesLiveAt }),
-    });
-    const liveTimeStr = new Date(goesLiveAt).toLocaleString();
-    $('classModalMsg').textContent = isNew
-      ? `✅ "${lesson.topic}" generated. Students will see it at ${liveTimeStr}.`
-      : `ℹ A lesson already exists for today's ${cap(subject)} class. Remove it first to reschedule.`;
-  } catch (e) {
-    $('classModalMsg').textContent = '⚠ ' + e.message;
-    btns.forEach((b) => { b.disabled = false; });
-  }
+  const goBtn = document.createElement('button');
+  goBtn.className = 'btn btn-accent btn-sm';
+  goBtn.textContent = 'Generate & Schedule';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn btn-sm';
+  cancelBtn.style.color = 'var(--muted)';
+  cancelBtn.textContent = 'Cancel';
+
+  wrap.appendChild(label);
+  wrap.appendChild(input);
+  wrap.appendChild(goBtn);
+  wrap.appendChild(cancelBtn);
+  msg.innerHTML = '';
+  msg.appendChild(wrap);
+
+  cancelBtn.addEventListener('click', () => { msg.innerHTML = ''; });
+
+  goBtn.addEventListener('click', async () => {
+    if (!input.value) { msg.textContent = '⚠ Please pick a date and time.'; return; }
+    const goesLiveAt = new Date(input.value).toISOString();
+    goBtn.disabled = true;
+    cancelBtn.disabled = true;
+    goBtn.textContent = 'Generating…';
+
+    try {
+      const { lesson, isNew } = await api('/api/lessons/generate', {
+        method: 'POST',
+        body: JSON.stringify({ subject, department, goes_live_at: goesLiveAt }),
+      });
+      const liveTimeStr = new Date(goesLiveAt).toLocaleString();
+      if (isNew) {
+        msg.textContent = `✅ "${lesson.topic}" scheduled — students will see it at ${liveTimeStr}.`;
+        metaEl.textContent = `Day ${lesson.day_number} · ${lesson.topic} · Scheduled: ${liveTimeStr}`;
+        if (schedBtn) { schedBtn.textContent = '📅 Rescheduled'; schedBtn.disabled = true; }
+      } else {
+        msg.textContent = `ℹ A lesson already exists for today's ${cap(subject)} class. Remove it first if you want to reschedule.`;
+        goBtn.disabled = false;
+        cancelBtn.disabled = false;
+        goBtn.textContent = 'Generate & Schedule';
+      }
+    } catch (e) {
+      msg.textContent = '⚠ ' + e.message;
+      goBtn.disabled = false;
+      cancelBtn.disabled = false;
+      goBtn.textContent = 'Generate & Schedule';
+    }
+  });
 }
 
 // ── Admin: Manual grading panel ──────────────────────────────────────────────
