@@ -869,6 +869,7 @@ async function enterAsStudent(data) {
     $('adminClassBtn').hidden = false;
     $('adminGradeBtn').hidden = false;
     $('adminQuestionsBtn').hidden = false;
+    $('adminPasswordBtn').hidden = false;
     $('adminResetBtn').hidden = false;
   }
 
@@ -1346,6 +1347,41 @@ function downloadQuestions() {
   URL.revokeObjectURL(url);
 }
 
+// ── Admin: Set student password ───────────────────────────────────────────────
+function openPasswordModal() {
+  $('passwordEmail').value = '';
+  $('passwordNew').value = '';
+  $('passwordMsg').textContent = '';
+  $('passwordModal').classList.remove('hidden');
+  $('passwordEmail').focus();
+}
+
+async function savePassword() {
+  const email = $('passwordEmail').value.trim();
+  const password = $('passwordNew').value;
+  const msg = $('passwordMsg');
+  msg.textContent = '';
+  if (!email || !password) { msg.textContent = 'Enter both email and new password.'; return; }
+  if (password.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; return; }
+  const btn = $('passwordSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await api('/api/admin/set-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    msg.style.color = 'var(--green, #4ade80)';
+    msg.textContent = `✅ Password updated for ${email}.`;
+    $('passwordEmail').value = '';
+    $('passwordNew').value = '';
+  } catch (e) {
+    msg.style.color = '';
+    msg.textContent = '⚠ ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Set Password';
+  }
+}
+
 // ── Admin: Outlines upload ────────────────────────────────────────────────────
 function openOutlines() {
   $('outlinesMsg').textContent = '';
@@ -1465,6 +1501,11 @@ function wireEvents() {
   $('questionsModalClose').addEventListener('click', () => $('questionsModal').classList.add('hidden'));
   $('questionsLoadBtn').addEventListener('click', loadQuestions);
   $('questionsDownloadBtn').addEventListener('click', downloadQuestions);
+
+  // Admin — Password
+  $('adminPasswordBtn').addEventListener('click', openPasswordModal);
+  $('passwordModalClose').addEventListener('click', () => $('passwordModal').classList.add('hidden'));
+  $('passwordSaveBtn').addEventListener('click', savePassword);
 
   // Admin — Outlines
   $('adminOutlinesBtn').addEventListener('click', openOutlines);

@@ -69,6 +69,7 @@
       <button id="adminGradeBtn" class="admin-btn" hidden>📝 Grade</button>
       <button id="adminQuestionsBtn" class="admin-btn" hidden>📬 Questions</button>
       <button id="adminOutlinesBtn" class="admin-btn" hidden>📚 Outlines</button>
+      <button id="adminPasswordBtn" class="admin-btn" hidden>🔑 Password</button>
       <button id="adminResetBtn" class="admin-btn admin-btn-danger" hidden>🗑 Reset</button>
       <button id="logoutBtn" class="logout-btn" hidden>Log out</button>
       <div id="modeBadge" class="badge badge-muted" style="display:none"></div>
@@ -347,6 +348,21 @@
     </div>
   </div>
 
-  <script src="/app.js?v=10"></script>
+  <!-- ── Admin: set student password ─────────────────────────────────────────── -->
+  <div id="passwordModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>🔑 Set Student Password</h2>
+        <button id="passwordModalClose" class="modal-close" aria-label="Close">✕</button>
+      </div>
+      <p class="modal-sub">Enter the student's email and a new password. This updates their account on both the tutorial app and the CBT app.</p>
+      <input id="passwordEmail" class="auth-input" type="email" placeholder="Student email address" autocomplete="off" />
+      <input id="passwordNew" class="auth-input" type="password" placeholder="New password (min 6 characters)" autocomplete="new-password" />
+      <button id="passwordSaveBtn" class="btn btn-primary modal-upload">Set Password</button>
+      <div id="passwordMsg" class="modal-msg"></div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=11"></script>
 </body>
 </html>

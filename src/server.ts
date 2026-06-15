@@ -636,6 +636,29 @@ app.get(
   }),
 );
 
+// Admin: set a new password for any student account.
+app.post(
+  '/api/admin/set-password',
+  wrap(async (req, res) => {
+    if (!(await requireAdmin(req))) {
+      res.status(403).json({ error: 'Admin only.' });
+      return;
+    }
+    const email = String(req.body?.email ?? '').trim();
+    const password = String(req.body?.password ?? '');
+    if (!email || !password) {
+      res.status(400).json({ error: 'email and password are required.' });
+      return;
+    }
+    if (password.length < 6) {
+      res.status(400).json({ error: 'Password must be at least 6 characters.' });
+      return;
+    }
+    await cbt.setUserPassword(email, password);
+    res.json({ ok: true });
+  }),
+);
+
 // Admin: delete all lesson records so next generate starts from Day 1.
 app.delete(
   '/api/admin/reset-lessons',

@@ -7,6 +7,14 @@ const client = createClient(CONFIG.cbt.url, CONFIG.cbt.anonKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
+// Admin client — only available when service role key is set.
+// Used for privileged auth operations (e.g. updating a user's password).
+const adminClient = CONFIG.cbt.serviceRoleKey
+  ? createClient(CONFIG.cbt.url, CONFIG.cbt.serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+  : null;
+
 export interface CbtProfile {
   id: string;
   student_id: string | null;
@@ -59,6 +67,21 @@ export async function getProfile(userId: string): Promise<CbtProfile | null> {
     .single();
   if (error) return null;
   return data as CbtProfile;
+}
+
+/** Admin: set a new password for a user identified by email. */
+export async function setUserPassword(email: string, newPassword: string): Promise<void> {
+  if (!adminClient) throw new Error('Service role key not configured.');
+  // Look up the user's auth id via the profiles table
+  const { data: profile, error: profileErr } = await adminClient
+    .from('profiles')
+    .select('id')
+    .eq('email', email.toLowerCase().trim())
+    .maybeSingle();
+  if (profileErr) throw new Error(profileErr.message);
+  if (!profile) throw new Error(`No account found for ${email}.`);
+  const { error } = await adminClient.auth.admin.updateUserById(profile.id, { password: newPassword });
+  if (error) throw new Error(error.message);
 }
 
 /** Upcoming admin-scheduled mocks — the classroom's "upcoming events". */
