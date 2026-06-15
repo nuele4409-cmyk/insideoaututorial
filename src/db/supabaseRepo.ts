@@ -247,6 +247,7 @@ export async function reseed(): Promise<void> {
 
 // ── Group class: daily lessons ────────────────────────────────────────────────
 
+/** Admin / internal: returns any lesson for today, regardless of goes_live_at. */
 export async function getTodayLesson(subject: string, department: string, date: string): Promise<DailyLesson | null> {
   const { data } = await sb
     .from('tutor_daily_lessons')
@@ -256,6 +257,35 @@ export async function getTodayLesson(subject: string, department: string, date: 
     .eq('lesson_date', date)
     .maybeSingle();
   return (data as DailyLesson) ?? null;
+}
+
+/** Student: returns today's lesson only when it is live (goes_live_at IS NULL or already past). */
+export async function getLiveTodayLesson(subject: string, department: string, date: string): Promise<DailyLesson | null> {
+  const now = new Date().toISOString();
+  const { data } = await sb
+    .from('tutor_daily_lessons')
+    .select('*')
+    .eq('subject', subject)
+    .eq('department', department)
+    .eq('lesson_date', date)
+    .or(`goes_live_at.is.null,goes_live_at.lte.${now}`)
+    .maybeSingle();
+  return (data as DailyLesson) ?? null;
+}
+
+/** Student: returns the next scheduled (but not yet live) lesson for this subject+department. */
+export async function getNextScheduledLesson(subject: string, department: string): Promise<DailyLesson | null> {
+  const now = new Date().toISOString();
+  const { data } = await sb
+    .from('tutor_daily_lessons')
+    .select('*')
+    .eq('subject', subject)
+    .eq('department', department)
+    .not('goes_live_at', 'is', null)
+    .gt('goes_live_at', now)
+    .order('goes_live_at', { ascending: true })
+    .limit(1);
+  return data && data.length ? (data[0] as DailyLesson) : null;
 }
 
 export async function getLastLesson(subject: string, department: string): Promise<DailyLesson | null> {
@@ -289,7 +319,7 @@ export async function getLessonStatus(date: string) {
       // ── Today's lesson (if any) ──────────────────────────────────────
       const { data: lesson } = await sb
         .from('tutor_daily_lessons')
-        .select('day_number, topic')
+        .select('day_number, topic, goes_live_at')
         .eq('subject', subject)
         .eq('department', track.key)
         .eq('lesson_date', date)
@@ -338,6 +368,7 @@ export async function getLessonStatus(date: string) {
         label: subjectLabel(subject),
         day_number: (lesson as any).day_number,
         topic: (lesson as any).topic,
+        goes_live_at: (lesson as any).goes_live_at ?? null,
         submitted: submitted ?? 0,
         graded: graded ?? 0,
         nextDay: nextDayNum,

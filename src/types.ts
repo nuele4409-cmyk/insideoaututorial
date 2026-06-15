@@ -102,6 +102,7 @@ export interface DailyLesson {
   assignment_prompt: string;    // Take-home assignment (graded by teacher)
   lesson_date: string; // YYYY-MM-DD
   generated_at: string;
+  goes_live_at?: string | null; // NULL = live immediately; future ISO timestamp = scheduled
 }
 
 /** A question a student submits after class, to be answered in the WhatsApp group. */

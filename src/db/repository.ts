@@ -236,6 +236,12 @@ const GROUP_CLASS_ERR = 'Group class requires TUTOR_STORE=supabase.';
 export async function getTodayLesson(_subject: string, _department: string, _date: string): Promise<DailyLesson | null> {
   throw new Error(GROUP_CLASS_ERR);
 }
+export async function getLiveTodayLesson(_subject: string, _department: string, _date: string): Promise<DailyLesson | null> {
+  throw new Error(GROUP_CLASS_ERR);
+}
+export async function getNextScheduledLesson(_subject: string, _department: string): Promise<DailyLesson | null> {
+  throw new Error(GROUP_CLASS_ERR);
+}
 export async function getLastLesson(_subject: string, _department: string): Promise<DailyLesson | null> {
   throw new Error(GROUP_CLASS_ERR);
 }

@@ -16,10 +16,19 @@ export interface OpenClassResult {
   isNew: boolean;
 }
 
-/** Admin: generate (or return cached) today's lesson for a subject + department. */
-export async function openClass(subject: string, department: string): Promise<OpenClassResult> {
+/**
+ * Admin: generate (or return cached) today's lesson for a subject + department.
+ * Pass goesLiveAt (ISO string) to schedule the lesson for a future time — students
+ * won't see it until that moment.  Pass null / omit to make it live immediately.
+ */
+export async function openClass(
+  subject: string,
+  department: string,
+  goesLiveAt?: string | null,
+): Promise<OpenClassResult> {
   const date = todayWAT();
 
+  // getTodayLesson has no live filter, so it finds both live AND scheduled lessons.
   const existing = await repo.getTodayLesson(subject, department, date);
   if (existing) return { lesson: existing, isNew: false };
 
@@ -44,6 +53,7 @@ export async function openClass(subject: string, department: string): Promise<Op
     classwork_prompt: classworkPrompt,
     assignment_prompt: assignmentPrompt,
     lesson_date: date,
+    goes_live_at: goesLiveAt ?? null,
   });
 
   return { lesson, isNew: true };

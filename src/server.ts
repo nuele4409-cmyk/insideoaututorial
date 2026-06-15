@@ -331,6 +331,7 @@ function todayWAT(): string {
 }
 
 // Admin: generate today's lesson for a subject + department (idempotent).
+// Optional body field goes_live_at (ISO 8601) schedules it for a future time.
 app.post(
   '/api/lessons/generate',
   wrap(async (req, res) => {
@@ -344,7 +345,18 @@ app.post(
       res.status(400).json({ error: 'subject and department are required.' });
       return;
     }
-    const result = await openClass(subject, department);
+
+    let goesLiveAt: string | null = null;
+    if (req.body?.goes_live_at) {
+      const d = new Date(String(req.body.goes_live_at));
+      if (Number.isNaN(d.getTime())) {
+        res.status(400).json({ error: 'goes_live_at must be a valid ISO 8601 date-time.' });
+        return;
+      }
+      goesLiveAt = d.toISOString();
+    }
+
+    const result = await openClass(subject, department, goesLiveAt);
     res.json({ lesson: result.lesson, isNew: result.isNew });
   }),
 );
@@ -431,7 +443,7 @@ app.post(
   }),
 );
 
-// Student / admin: get today's lesson for a subject + department.
+// Student: get today's live lesson (respects goes_live_at — scheduled lessons are hidden).
 app.get(
   '/api/lessons/today',
   wrap(async (req, res) => {
@@ -442,7 +454,22 @@ app.get(
       return;
     }
     const date = String(req.query.date ?? todayWAT());
-    const lesson = await repo.getTodayLesson(subject, department, date);
+    const lesson = await repo.getLiveTodayLesson(subject, department, date);
+    res.json({ lesson: lesson ?? null });
+  }),
+);
+
+// Student: get the next scheduled-but-not-yet-live lesson for a subject (for countdown display).
+app.get(
+  '/api/lessons/next-scheduled',
+  wrap(async (req, res) => {
+    const subject = String(req.query.subject ?? '').trim().toLowerCase();
+    const department = String(req.query.department ?? 'general').trim().toLowerCase();
+    if (!subject) {
+      res.status(400).json({ error: 'subject query param is required.' });
+      return;
+    }
+    const lesson = await repo.getNextScheduledLesson(subject, department);
     res.json({ lesson: lesson ?? null });
   }),
 );

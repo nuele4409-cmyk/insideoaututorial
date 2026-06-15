@@ -153,6 +153,17 @@ async function loadClassroom() {
     );
 
     if (!lesson) {
+      // Check for a lesson that is scheduled but not yet live
+      try {
+        const { lesson: scheduled } = await api(
+          `/api/lessons/next-scheduled?subject=${encodeURIComponent(state.subject)}&department=${encodeURIComponent(state.subjectDept)}`,
+        );
+        if (scheduled?.goes_live_at) {
+          hideBanner();
+          startScheduledCountdown(scheduled.goes_live_at, state.subject, state.subjectDept);
+          return;
+        }
+      } catch {}
       hideBanner();
       showNoLesson();
       resetStatus();
@@ -435,10 +446,49 @@ function showQuestionSection() {
 }
 
 function showNoLesson() {
+  if (_countdownTimer) { clearInterval(_countdownTimer); _countdownTimer = null; }
   const p = $('noLesson').querySelector('p');
   if (p) p.textContent = `Today's ${cap(state.subject || 'class')} lesson hasn't been opened yet. Check back soon.`;
   $('noLesson').classList.remove('hidden');
   $('lessonView').classList.add('hidden');
+}
+
+// ── Scheduled-class countdown ─────────────────────────────────────────────────
+let _countdownTimer = null;
+
+function startScheduledCountdown(goesLiveAt, subject, dept) {
+  if (_countdownTimer) { clearInterval(_countdownTimer); _countdownTimer = null; }
+
+  const target = new Date(goesLiveAt).getTime();
+  const noLessonEl = $('noLesson');
+  const p = noLessonEl.querySelector('p');
+  noLessonEl.classList.remove('hidden');
+  $('lessonView').classList.add('hidden');
+
+  function tick() {
+    const diff = target - Date.now();
+    if (diff <= 0) {
+      clearInterval(_countdownTimer);
+      _countdownTimer = null;
+      if (p) p.textContent = `${cap(subject || 'class')} class is starting…`;
+      loadClassroom();
+      return;
+    }
+    const h = Math.floor(diff / 3_600_000);
+    const m = Math.floor((diff % 3_600_000) / 60_000);
+    const s = Math.floor((diff % 60_000) / 1_000);
+    const parts = [];
+    if (h) parts.push(`${h}h`);
+    if (h || m) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    if (p) p.innerHTML =
+      `${cap(subject || 'class')} class is coming up.<br>` +
+      `<span style="font-size:1.8em;font-weight:700;color:var(--accent);letter-spacing:.04em">${parts.join(' ')}</span><br>` +
+      `<small style="color:var(--muted)">The lesson will open automatically when the time arrives.</small>`;
+  }
+
+  tick();
+  _countdownTimer = setInterval(tick, 1000);
 }
 
 // ── File attachment — classwork ───────────────────────────────────────────────
@@ -949,9 +999,13 @@ function renderClassByTrack(tracks) {
 
       const meta = document.createElement('span');
       meta.className = 'class-subject-meta';
-      meta.textContent = s.day_number
-        ? `Day ${s.day_number} · ${s.topic} · ${s.submitted ?? 0} submitted, ${s.graded ?? 0} graded`
-        : 'No class yet today';
+      if (s.day_number && s.goes_live_at && new Date(s.goes_live_at) > new Date()) {
+        meta.textContent = `Day ${s.day_number} · ${s.topic} · Scheduled: ${new Date(s.goes_live_at).toLocaleString()}`;
+      } else if (s.day_number) {
+        meta.textContent = `Day ${s.day_number} · ${s.topic} · ${s.submitted ?? 0} submitted, ${s.graded ?? 0} graded`;
+      } else {
+        meta.textContent = 'No class yet today';
+      }
       info.appendChild(meta);
 
       // Next lesson from curriculum (shows that CSV is loaded)
@@ -990,7 +1044,14 @@ function renderClassByTrack(tracks) {
       clearBtn.title = `Clear ALL ${s.label || s.subject} lessons — resets to Day 1`;
       clearBtn.addEventListener('click', () => clearSubjectLessons(s.subject, track.key, clearBtn, meta, btn));
 
+      const schedBtn = document.createElement('button');
+      schedBtn.className = 'btn btn-secondary btn-sm';
+      schedBtn.textContent = '📅 Schedule';
+      schedBtn.title = 'Generate lesson now, but set a future date/time for students to see it';
+      schedBtn.addEventListener('click', () => openScheduleDialog(s.subject, track.key, meta));
+
       btnWrap.appendChild(btn);
+      btnWrap.appendChild(schedBtn);
       btnWrap.appendChild(demoBtn);
       btnWrap.appendChild(clearDemoBtn);
       btnWrap.appendChild(clearBtn);
@@ -1085,6 +1146,47 @@ async function clearSubjectLessons(subject, department, clearBtn, metaEl, genera
   } finally {
     clearBtn.disabled = false;
     clearBtn.textContent = '🗑';
+  }
+}
+
+function openScheduleDialog(subject, department, metaEl) {
+  const msg = $('classModalMsg');
+  const pad = (n) => String(n).padStart(2, '0');
+  // Default to 1 hour from now in local time
+  const def = new Date(Date.now() + 3_600_000);
+  const defStr = `${def.getFullYear()}-${pad(def.getMonth()+1)}-${pad(def.getDate())}T${pad(def.getHours())}:${pad(def.getMinutes())}`;
+  const inputId = `schedLiveAt_${subject}`;
+
+  msg.innerHTML =
+    `<div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">` +
+    `<span style="color:var(--muted);font-size:.85em;">Go live at (your local time):</span>` +
+    `<input type="datetime-local" id="${inputId}" value="${defStr}" style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:.9em;">` +
+    `<button class="btn btn-accent btn-sm" onclick="confirmScheduleLesson('${subject}','${department}')">Generate &amp; Schedule</button>` +
+    `<button class="btn btn-sm" style="color:var(--muted)" onclick="$('classModalMsg').textContent=''">Cancel</button>` +
+    `</div>`;
+}
+
+async function confirmScheduleLesson(subject, department) {
+  const inputId = `schedLiveAt_${subject}`;
+  const input = document.getElementById(inputId);
+  if (!input || !input.value) { $('classModalMsg').textContent = '⚠ Please pick a date and time.'; return; }
+
+  const goesLiveAt = new Date(input.value).toISOString();
+  const btns = $('classModalMsg').querySelectorAll('button');
+  btns.forEach((b) => { b.disabled = true; });
+
+  try {
+    const { lesson, isNew } = await api('/api/lessons/generate', {
+      method: 'POST',
+      body: JSON.stringify({ subject, department, goes_live_at: goesLiveAt }),
+    });
+    const liveTimeStr = new Date(goesLiveAt).toLocaleString();
+    $('classModalMsg').textContent = isNew
+      ? `✅ "${lesson.topic}" generated. Students will see it at ${liveTimeStr}.`
+      : `ℹ A lesson already exists for today's ${cap(subject)} class. Remove it first to reschedule.`;
+  } catch (e) {
+    $('classModalMsg').textContent = '⚠ ' + e.message;
+    btns.forEach((b) => { b.disabled = false; });
   }
 }
 
