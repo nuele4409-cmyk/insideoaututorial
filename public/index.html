@@ -63,12 +63,12 @@
       </div>
     </div>
     <div class="topbar-right">
-      <button id="adminClassBtn" class="admin-btn" hidden> Open Class</button>
-      <button id="adminGradeBtn" class="admin-btn" hidden> Grade</button>
-      <button id="adminQuestionsBtn" class="admin-btn" hidden> Questions</button>
-      <button id="adminOutlinesBtn" class="admin-btn" hidden> Outlines</button>
-      <button id="adminPasswordBtn" class="admin-btn" hidden> Password</button>
-      <button id="adminResetBtn" class="admin-btn admin-btn-danger" hidden> Reset</button>
+      <button id="adminClassBtn" class="admin-btn" hidden>&#x1F4CB; Open Class</button>
+      <button id="adminGradeBtn" class="admin-btn" hidden>&#x270F;&#xFE0F; Grade</button>
+      <button id="adminQuestionsBtn" class="admin-btn" hidden>&#x1F4EC; Questions</button>
+      <button id="adminOutlinesBtn" class="admin-btn" hidden>&#x1F4DA; Outlines</button>
+      <button id="adminPasswordBtn" class="admin-btn" hidden>&#x1F512; Password</button>
+      <button id="adminResetBtn" class="admin-btn admin-btn-danger" hidden>&#x1F504; Reset</button>
       <button id="logoutBtn" class="logout-btn" hidden>Log out</button>
       <div id="modeBadge" class="badge badge-muted" style="display:none"></div>
     </div>
@@ -135,7 +135,7 @@
         <!--  CLASSWORK  -->
         <!-- Classwork card  appears after lesson reveals -->
         <div id="classworkCard" class="assignment-card classwork-card hidden">
-          <div class="assignment-label"> Classwork</div>
+          <div class="assignment-label">&#x270F;&#xFE0F; Classwork</div>
           <div id="classworkText" class="assignment-text"></div>
         </div>
 
@@ -154,7 +154,7 @@
               <input id="classworkFile" type="file" accept="image/*,application/pdf" style="display:none" />
             </label>
             <span id="classworkAttachName" class="attach-name"></span>
-            <button id="classworkAttachClear" class="link-btn attach-clear hidden" type="button"> Remove</button>
+            <button id="classworkAttachClear" class="link-btn attach-clear hidden" type="button">&times; Remove</button>
           </div>
           <button id="classworkSubmitBtn" class="btn btn-accent submit-btn" type="button">Submit Classwork</button>
         </div>
@@ -182,7 +182,7 @@
         <!--  ASSIGNMENT  -->
         <!-- Assignment card  hidden until reveal reaches it -->
         <div id="assignmentCard" class="assignment-card hidden">
-          <div class="assignment-label"> Assignment</div>
+          <div class="assignment-label">&#x1F4DD; Assignment</div>
           <div id="assignmentText" class="assignment-text"></div>
         </div>
 
@@ -203,7 +203,7 @@
               <input id="answerFile" type="file" accept="image/*,application/pdf" style="display:none" />
             </label>
             <span id="attachName" class="attach-name"></span>
-            <button id="attachClear" class="link-btn attach-clear hidden" type="button"> Remove</button>
+            <button id="attachClear" class="link-btn attach-clear hidden" type="button">&times; Remove</button>
           </div>
 
           <button id="submitBtn" class="btn btn-accent submit-btn" type="button">Submit Assignment</button>
@@ -251,7 +251,7 @@
               <input id="questionFile" type="file" accept="image/*,application/pdf" style="display:none" />
             </label>
             <span id="questionAttachName" class="attach-name"></span>
-            <button id="questionAttachClear" class="link-btn attach-clear hidden" type="button"> Remove</button>
+            <button id="questionAttachClear" class="link-btn attach-clear hidden" type="button">&times; Remove</button>
           </div>
           <div id="questionSubmittedMsg" class="question-sent hidden">
              Question sent  watch the WhatsApp group for the answer.
@@ -269,7 +269,7 @@
   <div id="classModal" class="modal-overlay hidden">
     <div class="modal-box modal-box-wide">
       <div class="modal-head">
-        <h2> Open Today's Classes</h2>
+        <h2>&#x1F4CB; Open Today's Classes</h2>
         <button id="classModalClose" class="modal-close" aria-label="Close">&times;</button>
       </div>
       <p class="modal-sub">
@@ -284,7 +284,7 @@
   <div id="gradeModal" class="modal-overlay hidden">
     <div class="modal-box modal-box-wide">
       <div class="modal-head">
-        <h2> Grade Submissions</h2>
+        <h2>&#x270F;&#xFE0F; Grade Submissions</h2>
         <button id="gradeModalClose" class="modal-close" aria-label="Close">&times;</button>
       </div>
       <p class="modal-sub">
@@ -308,7 +308,7 @@
   <div id="questionsModal" class="modal-overlay hidden">
     <div class="modal-box modal-box-wide">
       <div class="modal-head">
-        <h2> Student Questions</h2>
+        <h2>&#x1F4EC; Student Questions</h2>
         <button id="questionsModalClose" class="modal-close" aria-label="Close">&times;</button>
       </div>
       <p class="modal-sub">
@@ -320,7 +320,7 @@
           <option value="">All subjects</option>
         </select>
         <button id="questionsLoadBtn" class="btn btn-secondary btn-sm">Load</button>
-        <button id="questionsDownloadBtn" class="btn btn-secondary btn-sm" style="margin-left:auto"> Download</button>
+        <button id="questionsDownloadBtn" class="btn btn-secondary btn-sm" style="margin-left:auto">&#x1F4E5; Download</button>
       </div>
       <div id="questionsList" class="grade-list"></div>
       <div id="questionsModalMsg" class="modal-msg"></div>
@@ -331,7 +331,7 @@
   <div id="outlinesModal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <h2> Upload course outlines</h2>
+        <h2>&#x1F4DA; Upload course outlines</h2>
         <button id="outlinesClose" class="modal-close" aria-label="Close">&times;</button>
       </div>
       <p class="modal-sub">
@@ -339,7 +339,7 @@
         app's keys (physics, chemistry, biology, mathematics, economics, government, literature,
         geography, history, agric, crs, irs, further_maths). A row replaces that subject+day.
       </p>
-      <a class="modal-template" href="/outline_template.csv" download> Download template CSV</a>
+      <a class="modal-template" href="/outline_template.csv" download>&#x2B07; Download template CSV</a>
       <input type="file" id="outlinesFile" accept=".csv,text/csv" class="modal-file" />
       <button id="outlinesUploadBtn" class="btn btn-primary modal-upload">Upload outlines</button>
       <div id="outlinesMsg" class="modal-msg"></div>
@@ -350,7 +350,7 @@
   <div id="passwordModal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <h2> Set Student Password</h2>
+        <h2>&#x1F512; Set Student Password</h2>
         <button id="passwordModalClose" class="modal-close" aria-label="Close">&times;</button>
       </div>
       <p class="modal-sub">Enter the student's email and a new password. This updates their account on both the tutorial app and the CBT app.</p>
