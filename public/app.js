@@ -17,7 +17,7 @@ const state = {
 const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// ── API helper ───────────────────────────────────────────────────────────────
+//  API helper 
 async function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (state.token) headers['Authorization'] = 'Bearer ' + state.token;
@@ -27,7 +27,7 @@ async function api(path, opts = {}) {
   return data;
 }
 
-// ── Session persistence ───────────────────────────────────────────────────────
+//  Session persistence 
 const SESSION_KEY = 'oau_tutor_session';
 
 function saveSession(data) {
@@ -53,7 +53,7 @@ function logout() {
   location.reload();
 }
 
-// ── Boot ─────────────────────────────────────────────────────────────────────
+//  Boot 
 async function init() {
   try {
     const health = await api('/api/health');
@@ -71,7 +71,7 @@ async function init() {
     state.token = savedToken; // set so api() sends Authorization header
     try {
       const data = await api('/api/auth/restore');
-      // Token still valid — enter without showing login
+      // Token still valid  enter without showing login
       $('loginOverlay').classList.add('hidden');
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
@@ -79,7 +79,7 @@ async function init() {
       document.body.style.width = '';
       await enterAsStudent(data);
     } catch {
-      // Expired or invalid — clear and stay on login screen
+      // Expired or invalid  clear and stay on login screen
       state.token = null;
       clearSession();
     }
@@ -89,21 +89,21 @@ async function init() {
 function setMode(tutor, model) {
   const b = $('modeBadge');
   if (tutor === 'claude') {
-    b.textContent = `● Claude · ${model}`;
+    b.textContent = ` Claude  ${model}`;
     b.className = 'badge badge-live';
   } else if (tutor === 'gemini') {
-    b.textContent = `● Gemini · ${model}`;
+    b.textContent = ` Gemini  ${model}`;
     b.className = 'badge badge-gemini';
   } else if (tutor === 'offline-stub') {
-    b.textContent = '● Offline stub';
+    b.textContent = ' Offline stub';
     b.className = 'badge badge-stub';
   } else {
-    b.textContent = '● Server offline';
+    b.textContent = ' Server offline';
     b.className = 'badge badge-muted';
   }
 }
 
-// ── Subject selection ─────────────────────────────────────────────────────────
+//  Subject selection 
 function renderSubjects() {
   const sel = $('subjectSelect');
   sel.innerHTML = '';
@@ -133,17 +133,17 @@ async function selectSubject(subject) {
   await loadClassroom();
 }
 
-// ── Reveal key for sessionStorage ────────────────────────────────────────────
+//  Reveal key for sessionStorage 
 function revealKey() {
   const today = new Date().toISOString().slice(0, 10);
   return `lesson_seen_${state.subject}_${today}`;
 }
 
-// ── Classroom loader ──────────────────────────────────────────────────────────
+//  Classroom loader 
 async function loadClassroom() {
   if (!state.student || !state.subject) return;
 
-  showClassroomBanner('Loading today\'s class…', 'muted');
+  showClassroomBanner('Loading today\'s class', 'muted');
   $('noLesson').classList.add('hidden');
   $('lessonView').classList.add('hidden');
 
@@ -223,7 +223,7 @@ function resetLessonCards() {
   ].forEach((id) => $(id).classList.add('hidden'));
 }
 
-// ── Section parser ────────────────────────────────────────────────────────────
+//  Section parser 
 function parseSections(content) {
   const result = [];
   const parts = String(content).split(/(?=##\s+(?:SECTION|CHECK)\s+\d)/i);
@@ -250,7 +250,7 @@ function parseSections(content) {
   return result;
 }
 
-// ── Lesson reveal ─────────────────────────────────────────────────────────────
+//  Lesson reveal 
 async function revealLesson(lesson, instant) {
   $('lessonDayTag').textContent = `Day ${lesson.day_number}`;
   $('lessonTopic').textContent = lesson.topic;
@@ -273,7 +273,7 @@ async function revealLesson(lesson, instant) {
     return;
   }
 
-  // Animated: mark as seen immediately so refresh → instant
+  // Animated: mark as seen immediately so refresh  instant
   sessionStorage.setItem(revealKey(), '1');
 
   for (const block of blocks) {
@@ -293,7 +293,7 @@ async function revealLesson(lesson, instant) {
   }
 }
 
-// ── Paragraph helpers ─────────────────────────────────────────────────────────
+//  Paragraph helpers 
 function appendPara(container, text, animate) {
   const p = document.createElement('p');
   if (/^key takeaway:/i.test(text)) p.className = 'lesson-takeaway';
@@ -304,20 +304,20 @@ function appendPara(container, text, animate) {
   if (window.MathJax?.typesetPromise) MathJax.typesetPromise([p]).catch(() => {});
 }
 
-// ── Checkpoint gates ──────────────────────────────────────────────────────────
+//  Checkpoint gates 
 function showCheckpointGate(container, question) {
   return new Promise((resolve) => {
     const gate = document.createElement('div');
     gate.className = 'checkpoint-gate card-reveal';
     gate.innerHTML =
-      '<div class="checkpoint-icon">✍️</div>' +
+      '<div class="checkpoint-icon"></div>' +
       '<div class="checkpoint-question">' + escapeHtml(question) + '</div>' +
-      '<p class="checkpoint-hint">Write your answer in your notebook. Take your time — click when you are ready.</p>' +
-      '<button class="btn btn-accent checkpoint-btn">I\'ve answered — continue</button>';
+      '<p class="checkpoint-hint">Write your answer in your notebook. Take your time  click when you are ready.</p>' +
+      '<button class="btn btn-accent checkpoint-btn">I\'ve answered  continue</button>';
     const btn = gate.querySelector('.checkpoint-btn');
     btn.addEventListener('click', () => {
       btn.disabled = true;
-      btn.textContent = '✓ Answered';
+      btn.textContent = ' Answered';
       gate.classList.add('checkpoint-done');
       resolve();
     });
@@ -331,14 +331,14 @@ function appendCheckGate(container, question) {
   const gate = document.createElement('div');
   gate.className = 'checkpoint-gate checkpoint-done';
   gate.innerHTML =
-    '<div class="checkpoint-icon">✍️</div>' +
+    '<div class="checkpoint-icon"></div>' +
     '<div class="checkpoint-question">' + escapeHtml(question) + '</div>' +
-    '<p class="checkpoint-hint">Write your answer in your notebook. Take your time — click when you are ready.</p>' +
-    '<button class="btn btn-secondary checkpoint-btn" disabled>✓ Answered</button>';
+    '<p class="checkpoint-hint">Write your answer in your notebook. Take your time  click when you are ready.</p>' +
+    '<button class="btn btn-secondary checkpoint-btn" disabled> Answered</button>';
   container.appendChild(gate);
 }
 
-// ── Classwork card ────────────────────────────────────────────────────────────
+//  Classwork card 
 function showClassworkCard(lesson) {
   const raw = lesson.classwork_prompt || '';
   const visible = raw.replace(/\[Rubric:[\s\S]*?\]/gi, '').trim();
@@ -387,7 +387,7 @@ function showClassworkGrade(score, feedback) {
   bar.className = 'grade-bar ' + (score >= 7 ? 'grade-bar-good' : score >= 5 ? 'grade-bar-ok' : 'grade-bar-weak');
 }
 
-// ── Assignment card ───────────────────────────────────────────────────────────
+//  Assignment card 
 function showAssignmentCard(lesson) {
   const raw = lesson.assignment_prompt || '';
   const visible = raw.replace(/\[Rubric:[\s\S]*?\]/gi, '').trim();
@@ -453,7 +453,7 @@ function showNoLesson() {
   $('lessonView').classList.add('hidden');
 }
 
-// ── Scheduled-class countdown ─────────────────────────────────────────────────
+//  Scheduled-class countdown 
 let _countdownTimer = null;
 
 function startScheduledCountdown(goesLiveAt, subject, dept) {
@@ -470,7 +470,7 @@ function startScheduledCountdown(goesLiveAt, subject, dept) {
     if (diff <= 0) {
       clearInterval(_countdownTimer);
       _countdownTimer = null;
-      if (p) p.textContent = `${cap(subject || 'class')} class is starting…`;
+      if (p) p.textContent = `${cap(subject || 'class')} class is starting`;
       loadClassroom();
       return;
     }
@@ -491,7 +491,7 @@ function startScheduledCountdown(goesLiveAt, subject, dept) {
   _countdownTimer = setInterval(tick, 1000);
 }
 
-// ── File attachment — classwork ───────────────────────────────────────────────
+//  File attachment  classwork 
 let classworkAttachedFile = null;
 
 function wireClassworkFile() {
@@ -501,7 +501,7 @@ function wireClassworkFile() {
     const file = input.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      showClassroomBanner('File too large — maximum 10 MB.', 'warn');
+      showClassroomBanner('File too large  maximum 10 MB.', 'warn');
       input.value = '';
       return;
     }
@@ -521,7 +521,7 @@ function wireClassworkFile() {
   });
 }
 
-// ── Submit classwork ──────────────────────────────────────────────────────────
+//  Submit classwork 
 async function submitClasswork() {
   if (state.busy || !state.student || !state.subject) return;
   const text = $('classworkInput').value.trim();
@@ -533,13 +533,13 @@ async function submitClasswork() {
   const btn = $('classworkSubmitBtn');
   setBusy(true);
   btn.disabled = true;
-  btn.textContent = 'Submitting…';
-  showClassroomBanner('Uploading…', 'muted');
+  btn.textContent = 'Submitting';
+  showClassroomBanner('Uploading', 'muted');
 
   try {
     let fileUrl = null;
     if (classworkAttachedFile) {
-      showClassroomBanner('Uploading file…', 'muted');
+      showClassroomBanner('Uploading file', 'muted');
       const up = await api('/api/submissions/upload-file', {
         method: 'POST',
         body: JSON.stringify({ dataUrl: classworkAttachedFile.dataUrl, filename: classworkAttachedFile.name }),
@@ -547,7 +547,7 @@ async function submitClasswork() {
       fileUrl = up.filePath;
     }
 
-    showClassroomBanner('Submitting classwork…', 'muted');
+    showClassroomBanner('Submitting classwork', 'muted');
     await api('/api/classwork', {
       method: 'POST',
       body: JSON.stringify({
@@ -585,14 +585,14 @@ async function refreshClassworkGrade() {
       showClassworkGrade(submission.score, submission.feedback);
       hideBanner();
     } else {
-      showClassroomBanner('Not graded yet — check back soon.', 'muted');
+      showClassroomBanner('Not graded yet  check back soon.', 'muted');
     }
   } catch (e) {
     showClassroomBanner(e.message, 'error');
   }
 }
 
-// ── File attachment — assignment ──────────────────────────────────────────────
+//  File attachment  assignment 
 let attachedFile = null;
 
 function wireAnswerFile() {
@@ -602,7 +602,7 @@ function wireAnswerFile() {
     const file = input.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      showClassroomBanner('File too large — maximum 10 MB.', 'warn');
+      showClassroomBanner('File too large  maximum 10 MB.', 'warn');
       input.value = '';
       return;
     }
@@ -622,7 +622,7 @@ function wireAnswerFile() {
   });
 }
 
-// ── Submit assignment ─────────────────────────────────────────────────────────
+//  Submit assignment 
 async function submitAnswer() {
   if (state.busy || !state.student || !state.subject) return;
   const text = $('answerInput').value.trim();
@@ -632,12 +632,12 @@ async function submitAnswer() {
   }
 
   setBusy(true);
-  showClassroomBanner('Uploading…', 'muted');
+  showClassroomBanner('Uploading', 'muted');
 
   try {
     let fileUrl = null;
     if (attachedFile) {
-      showClassroomBanner('Uploading file…', 'muted');
+      showClassroomBanner('Uploading file', 'muted');
       const up = await api('/api/submissions/upload-file', {
         method: 'POST',
         body: JSON.stringify({ dataUrl: attachedFile.dataUrl, filename: attachedFile.name }),
@@ -645,7 +645,7 @@ async function submitAnswer() {
       fileUrl = up.filePath;
     }
 
-    showClassroomBanner('Submitting assignment…', 'muted');
+    showClassroomBanner('Submitting assignment', 'muted');
     const result = await api('/api/submissions', {
       method: 'POST',
       body: JSON.stringify({
@@ -686,14 +686,14 @@ async function refreshGrade() {
       showGrade(submission.score, submission.feedback);
       hideBanner();
     } else {
-      showClassroomBanner('Not graded yet — check back soon.', 'muted');
+      showClassroomBanner('Not graded yet  check back soon.', 'muted');
     }
   } catch (e) {
     showClassroomBanner(e.message, 'error');
   }
 }
 
-// ── Question submission ───────────────────────────────────────────────────────
+//  Question submission 
 let questionFile = null;
 
 function wireQuestionFile() {
@@ -703,7 +703,7 @@ function wireQuestionFile() {
     const file = input.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      showClassroomBanner('File too large — maximum 10 MB.', 'warn');
+      showClassroomBanner('File too large  maximum 10 MB.', 'warn');
       input.value = '';
       return;
     }
@@ -733,7 +733,7 @@ async function submitQuestion() {
 
   const btn = $('submitQuestionBtn');
   btn.disabled = true;
-  btn.textContent = 'Sending…';
+  btn.textContent = 'Sending';
 
   try {
     let fileUrl = null;
@@ -762,7 +762,7 @@ async function submitQuestion() {
     $('questionAttachName').textContent = '';
     $('questionAttachClear').classList.add('hidden');
     $('questionSubmittedMsg').classList.remove('hidden');
-    btn.textContent = '✓ Sent';
+    btn.textContent = ' Sent';
   } catch (e) {
     showClassroomBanner(e.message, 'error');
     btn.disabled = false;
@@ -770,19 +770,19 @@ async function submitQuestion() {
   }
 }
 
-// ── Status bar ────────────────────────────────────────────────────────────────
+//  Status bar 
 function updateStatus({ day, topic, score, submitted } = {}) {
   if (day !== undefined) $('statDay').textContent = String(day);
   if (topic !== undefined) $('statTopic').textContent = topic;
   if (score !== undefined && score !== null) $('statScore').textContent = `${score}/10`;
-  if (submitted !== undefined) $('statSubmitted').textContent = submitted ? 'Yes ✓' : 'No';
+  if (submitted !== undefined) $('statSubmitted').textContent = submitted ? 'Yes ' : 'No';
 }
 
 function resetStatus() {
-  $('statDay').textContent = '—';
-  $('statTopic').textContent = '—';
-  $('statScore').textContent = '—';
-  $('statSubmitted').textContent = '—';
+  $('statDay').textContent = '';
+  $('statTopic').textContent = '';
+  $('statScore').textContent = '';
+  $('statSubmitted').textContent = '';
 }
 
 function setBusy(b) {
@@ -791,7 +791,7 @@ function setBusy(b) {
   if ($('classworkSubmitBtn')) $('classworkSubmitBtn').disabled = b;
 }
 
-// ── Banner ────────────────────────────────────────────────────────────────────
+//  Banner 
 function showClassroomBanner(text, kind) {
   const b = $('classroomBanner');
   b.textContent = text;
@@ -801,7 +801,7 @@ function hideBanner() {
   $('classroomBanner').className = 'banner hidden';
 }
 
-// ── Student load helpers ──────────────────────────────────────────────────────
+//  Student load helpers 
 async function loadStudents(selectId) {
   const students = await api('/api/students');
   const sel = $('studentSelect');
@@ -809,7 +809,7 @@ async function loadStudents(selectId) {
   students.forEach((s) => {
     const o = document.createElement('option');
     o.value = s.id;
-    o.textContent = `${s.full_name} · ${s.department}`;
+    o.textContent = `${s.full_name}  ${s.department}`;
     sel.appendChild(o);
   });
   const chosenId = selectId || students[0]?.id;
@@ -859,7 +859,7 @@ async function createStudent() {
   }
 }
 
-// ── Login ─────────────────────────────────────────────────────────────────────
+//  Login 
 async function doLogin() {
   const email = $('loginEmail').value.trim();
   const password = $('loginPassword').value;
@@ -868,7 +868,7 @@ async function doLogin() {
   if (!email || !password) { err.textContent = 'Enter your email and password.'; return; }
 
   const btn = $('loginBtn');
-  btn.disabled = true; btn.textContent = 'Signing in…';
+  btn.disabled = true; btn.textContent = 'Signing in';
   try {
     const data = await api('/api/auth/login', {
       method: 'POST',
@@ -900,7 +900,7 @@ async function enterAsStudent(data) {
   sel.innerHTML = '';
   const o = document.createElement('option');
   o.value = data.studentId;
-  o.textContent = `${data.studentId} · ${data.full_name}`;
+  o.textContent = `${data.studentId}  ${data.full_name}`;
   sel.appendChild(o);
   sel.value = data.studentId;
   const toggle = $('newStudentToggle');
@@ -931,7 +931,7 @@ async function enterAsStudent(data) {
 }
 
 
-// ── Upcoming events ───────────────────────────────────────────────────────────
+//  Upcoming events 
 async function loadEvents() {
   const link = $('announceLink');
   try {
@@ -943,12 +943,12 @@ async function loadEvents() {
         weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
       });
       const uni = e.university && String(e.university).toUpperCase() !== 'ALL'
-        ? ' · ' + escapeHtml(e.university) : '';
+        ? '  ' + escapeHtml(e.university) : '';
       $('announceText').innerHTML =
         '<strong>' + escapeHtml(e.title) + '</strong><br>' + escapeHtml(dateStr) + uni +
         (e.description ? '<br><span style="color:var(--dim)">' + escapeHtml(e.description) + '</span>' : '');
       link.href = e.link;
-      link.textContent = 'Join event →';
+      link.textContent = 'Join event ';
       link.hidden = false;
     } else {
       $('announceText').textContent = 'No upcoming mocks scheduled yet.';
@@ -960,10 +960,10 @@ async function loadEvents() {
   }
 }
 
-// ── Admin: Open Class modal ───────────────────────────────────────────────────
+//  Admin: Open Class modal 
 async function openClassModal() {
   $('classModalMsg').textContent = '';
-  $('classSubjectList').innerHTML = '<p style="color:var(--muted)">Loading status…</p>';
+  $('classSubjectList').innerHTML = '<p style="color:var(--muted)">Loading status</p>';
   $('classModal').classList.remove('hidden');
 
   try {
@@ -1000,9 +1000,9 @@ function renderClassByTrack(tracks) {
       const meta = document.createElement('span');
       meta.className = 'class-subject-meta';
       if (s.day_number && s.goes_live_at && new Date(s.goes_live_at) > new Date()) {
-        meta.textContent = `Day ${s.day_number} · ${s.topic} · Scheduled: ${new Date(s.goes_live_at).toLocaleString()}`;
+        meta.textContent = `Day ${s.day_number}  ${s.topic}  Scheduled: ${new Date(s.goes_live_at).toLocaleString()}`;
       } else if (s.day_number) {
-        meta.textContent = `Day ${s.day_number} · ${s.topic} · ${s.submitted ?? 0} submitted, ${s.graded ?? 0} graded`;
+        meta.textContent = `Day ${s.day_number}  ${s.topic}  ${s.submitted ?? 0} submitted, ${s.graded ?? 0} graded`;
       } else {
         meta.textContent = 'No class yet today';
       }
@@ -1012,7 +1012,7 @@ function renderClassByTrack(tracks) {
       if (s.nextTopic) {
         const next = document.createElement('span');
         next.className = 'class-subject-next';
-        next.textContent = `📚 Next: Day ${s.nextDay} · ${s.nextTopic}`;
+        next.textContent = ` Next: Day ${s.nextDay}  ${s.nextTopic}`;
         info.appendChild(next);
       }
 
@@ -1021,32 +1021,32 @@ function renderClassByTrack(tracks) {
 
       const btn = document.createElement('button');
       btn.className = s.day_number ? 'btn btn-secondary btn-sm' : 'btn btn-accent btn-sm';
-      btn.textContent = s.day_number ? '↻ Regenerate' : 'Generate';
+      btn.textContent = s.day_number ? ' Regenerate' : 'Generate';
       btn.addEventListener('click', () => generateLesson(s.subject, track.key, btn, meta));
 
       const demoBtn = document.createElement('button');
       demoBtn.className = 'btn btn-secondary btn-sm';
-      demoBtn.textContent = '🧪 Demo';
-      demoBtn.title = 'Insert a demo lesson — no AI tokens used';
+      demoBtn.textContent = ' Demo';
+      demoBtn.title = 'Insert a demo lesson  no AI tokens used';
       demoBtn.addEventListener('click', () => seedDemoLesson(s.subject, track.key, demoBtn, meta));
 
       const clearDemoBtn = document.createElement('button');
       clearDemoBtn.className = 'btn btn-sm';
       clearDemoBtn.style.cssText = 'background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);';
-      clearDemoBtn.textContent = '✕ Demo';
-      clearDemoBtn.title = `Clear today's demo for ${s.label || s.subject} — safe, won't touch a real lesson`;
+      clearDemoBtn.textContent = ' Demo';
+      clearDemoBtn.title = `Clear today's demo for ${s.label || s.subject}  safe, won't touch a real lesson`;
       clearDemoBtn.addEventListener('click', () => clearDemoLesson(s.subject, track.key, clearDemoBtn, meta, btn));
 
       const clearBtn = document.createElement('button');
       clearBtn.className = 'btn btn-sm';
       clearBtn.style.cssText = 'background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);';
-      clearBtn.textContent = '🗑';
-      clearBtn.title = `Clear ALL ${s.label || s.subject} lessons — resets to Day 1`;
+      clearBtn.textContent = '';
+      clearBtn.title = `Clear ALL ${s.label || s.subject} lessons  resets to Day 1`;
       clearBtn.addEventListener('click', () => clearSubjectLessons(s.subject, track.key, clearBtn, meta, btn));
 
       const schedBtn = document.createElement('button');
       schedBtn.className = 'btn btn-secondary btn-sm';
-      schedBtn.textContent = '📅 Schedule';
+      schedBtn.textContent = ' Schedule';
       schedBtn.title = 'Generate lesson now, but set a future date/time for students to see it';
       schedBtn.addEventListener('click', () => openScheduleDialog(s.subject, track.key, meta, schedBtn));
 
@@ -1064,48 +1064,48 @@ function renderClassByTrack(tracks) {
 
 async function generateLesson(subject, department, btn, metaEl) {
   btn.disabled = true;
-  btn.textContent = 'Generating…';
+  btn.textContent = 'Generating';
   $('classModalMsg').textContent = '';
   try {
     const { lesson, isNew } = await api('/api/lessons/generate', {
       method: 'POST',
       body: JSON.stringify({ subject, department }),
     });
-    btn.textContent = '✓ Done';
+    btn.textContent = ' Done';
     btn.className = 'btn btn-secondary btn-sm';
-    metaEl.textContent = `Day ${lesson.day_number} · ${lesson.topic} · ${isNew ? 'just generated' : 'already open'}`;
-    $('classModalMsg').textContent = `✅ "${lesson.topic}" is live for ${cap(subject)}.`;
+    metaEl.textContent = `Day ${lesson.day_number}  ${lesson.topic}  ${isNew ? 'just generated' : 'already open'}`;
+    $('classModalMsg').textContent = ` "${lesson.topic}" is live for ${cap(subject)}.`;
     if (state.subject === subject && state.subjectDept === department) await loadClassroom();
   } catch (e) {
     btn.disabled = false;
     btn.textContent = 'Retry';
-    $('classModalMsg').textContent = '⚠ ' + e.message;
+    $('classModalMsg').textContent = ' ' + e.message;
   }
 }
 
 async function seedDemoLesson(subject, department, btn, metaEl) {
   btn.disabled = true;
-  btn.textContent = 'Seeding…';
+  btn.textContent = 'Seeding';
   $('classModalMsg').textContent = '';
   try {
     const { lesson } = await api('/api/lessons/seed-demo', {
       method: 'POST',
       body: JSON.stringify({ subject, department }),
     });
-    btn.textContent = '✓ Done';
-    metaEl.textContent = `Day ${lesson.day_number} · ${lesson.topic} · demo lesson`;
-    $('classModalMsg').textContent = `✅ Demo lesson "${lesson.topic}" seeded for ${cap(subject)} — no tokens used.`;
+    btn.textContent = ' Done';
+    metaEl.textContent = `Day ${lesson.day_number}  ${lesson.topic}  demo lesson`;
+    $('classModalMsg').textContent = ` Demo lesson "${lesson.topic}" seeded for ${cap(subject)}  no tokens used.`;
     if (state.subject === subject && state.subjectDept === department) await loadClassroom();
   } catch (e) {
     btn.disabled = false;
-    btn.textContent = '🧪 Demo';
-    $('classModalMsg').textContent = '⚠ ' + e.message;
+    btn.textContent = ' Demo';
+    $('classModalMsg').textContent = ' ' + e.message;
   }
 }
 
 async function clearDemoLesson(subject, department, btn, metaEl, generateBtn) {
   btn.disabled = true;
-  btn.textContent = '…';
+  btn.textContent = '';
   $('classModalMsg').textContent = '';
   try {
     await api('/api/admin/reset-demo', {
@@ -1115,13 +1115,13 @@ async function clearDemoLesson(subject, department, btn, metaEl, generateBtn) {
     metaEl.textContent = 'No class yet today';
     generateBtn.className = 'btn btn-accent btn-sm';
     generateBtn.textContent = 'Generate';
-    $('classModalMsg').textContent = `✅ Demo cleared for ${cap(subject)}. Click 🧪 Demo or Generate to start fresh.`;
+    $('classModalMsg').textContent = ` Demo cleared for ${cap(subject)}. Click  Demo or Generate to start fresh.`;
     if (state.subject === subject && state.subjectDept === department) await loadClassroom();
   } catch (e) {
-    $('classModalMsg').textContent = '⚠ ' + e.message;
+    $('classModalMsg').textContent = ' ' + e.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = '✕ Demo';
+    btn.textContent = ' Demo';
   }
 }
 
@@ -1129,7 +1129,7 @@ async function clearSubjectLessons(subject, department, clearBtn, metaEl, genera
   const label = cap(subject);
   if (!confirm(`Clear all ${label} lessons?\n\nThis resets ${label} back to Day 1. The next Generate or Demo will start fresh.\n\nYour uploaded CSV outline is NOT affected.`)) return;
   clearBtn.disabled = true;
-  clearBtn.textContent = '…';
+  clearBtn.textContent = '';
   $('classModalMsg').textContent = '';
   try {
     const data = await api('/api/admin/reset-subject', {
@@ -1139,13 +1139,13 @@ async function clearSubjectLessons(subject, department, clearBtn, metaEl, genera
     metaEl.textContent = 'No class yet today';
     generateBtn.className = 'btn btn-accent btn-sm';
     generateBtn.textContent = 'Generate';
-    $('classModalMsg').textContent = `✅ ${label} cleared (${data.deleted} lesson${data.deleted !== 1 ? 's' : ''} removed). Ready to start from Day 1.`;
+    $('classModalMsg').textContent = ` ${label} cleared (${data.deleted} lesson${data.deleted !== 1 ? 's' : ''} removed). Ready to start from Day 1.`;
     if (state.subject === subject && state.subjectDept === department) await loadClassroom();
   } catch (e) {
-    $('classModalMsg').textContent = '⚠ ' + e.message;
+    $('classModalMsg').textContent = ' ' + e.message;
   } finally {
     clearBtn.disabled = false;
-    clearBtn.textContent = '🗑';
+    clearBtn.textContent = '';
   }
 }
 
@@ -1187,7 +1187,7 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
   cancelBtn.addEventListener('click', () => { msg.innerHTML = ''; });
 
   goBtn.addEventListener('click', async () => {
-    if (!input.value) { msg.textContent = '⚠ Please pick a date and time.'; return; }
+    if (!input.value) { msg.textContent = ' Please pick a date and time.'; return; }
     const goesLiveAt = new Date(input.value).toISOString();
     goBtn.disabled = true;
     cancelBtn.disabled = true;
@@ -1198,10 +1198,10 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
       const secs = Math.floor((Date.now() - start) / 1000);
       const mm = String(Math.floor(secs / 60)).padStart(2, '0');
       const ss = String(secs % 60).padStart(2, '0');
-      goBtn.textContent = `Generating… ${mm}:${ss}`;
+      goBtn.textContent = `Generating ${mm}:${ss}`;
     }, 1000);
-    goBtn.textContent = 'Generating… 00:00';
-    msg.textContent = '⏳ Claude is writing the lesson — this takes 1–3 minutes. Please wait.';
+    goBtn.textContent = 'Generating 00:00';
+    msg.textContent = ' Claude is writing the lesson  this takes 13 minutes. Please wait.';
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 360_000); // 6-min hard limit
@@ -1214,18 +1214,18 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
       });
       const liveTimeStr = new Date(goesLiveAt).toLocaleString();
       if (isNew) {
-        msg.textContent = `✅ "${lesson.topic}" scheduled — students will see it at ${liveTimeStr}.`;
-        metaEl.textContent = `Day ${lesson.day_number} · ${lesson.topic} · Scheduled: ${liveTimeStr}`;
-        if (schedBtn) { schedBtn.textContent = '📅 Rescheduled'; schedBtn.disabled = true; }
+        msg.textContent = ` "${lesson.topic}" scheduled  students will see it at ${liveTimeStr}.`;
+        metaEl.textContent = `Day ${lesson.day_number}  ${lesson.topic}  Scheduled: ${liveTimeStr}`;
+        if (schedBtn) { schedBtn.textContent = ' Rescheduled'; schedBtn.disabled = true; }
       } else {
-        msg.textContent = `ℹ A lesson already exists for today's ${cap(subject)} class. Remove it first if you want to reschedule.`;
+        msg.textContent = ` A lesson already exists for today's ${cap(subject)} class. Remove it first if you want to reschedule.`;
         goBtn.disabled = false;
         cancelBtn.disabled = false;
         goBtn.textContent = 'Generate & Schedule';
       }
     } catch (e) {
-      const errMsg = e.name === 'AbortError' ? 'Generation timed out — try again or check Railway logs.' : e.message;
-      msg.textContent = '⚠ ' + errMsg;
+      const errMsg = e.name === 'AbortError' ? 'Generation timed out  try again or check Railway logs.' : e.message;
+      msg.textContent = ' ' + errMsg;
       goBtn.disabled = false;
       cancelBtn.disabled = false;
       goBtn.textContent = 'Generate & Schedule';
@@ -1236,10 +1236,10 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
   });
 }
 
-// ── Admin: Manual grading panel ──────────────────────────────────────────────
+//  Admin: Manual grading panel 
 async function openGradeModal() {
   $('gradeModalMsg').textContent = '';
-  $('gradeList').innerHTML = '<p style="color:var(--muted)">Loading subjects…</p>';
+  $('gradeList').innerHTML = '<p style="color:var(--muted)">Loading subjects</p>';
   $('gradeModal').classList.remove('hidden');
 
   try {
@@ -1251,7 +1251,7 @@ async function openGradeModal() {
       track.subjects.filter((s) => s.day_number).forEach((s) => {
         const o = document.createElement('option');
         o.value = s.subject;
-        o.textContent = `${s.label || cap(s.subject)} (${track.label}) · Day ${s.day_number}`;
+        o.textContent = `${s.label || cap(s.subject)} (${track.label})  Day ${s.day_number}`;
         pick.appendChild(o);
         added++;
       });
@@ -1269,7 +1269,7 @@ async function openGradeModal() {
 async function loadGradeSubmissions() {
   const subject = $('gradeSubjectPick').value;
   if (!subject) return;
-  $('gradeList').innerHTML = '<p style="color:var(--muted)">Loading…</p>';
+  $('gradeList').innerHTML = '<p style="color:var(--muted)">Loading</p>';
   $('gradeModalMsg').textContent = '';
   try {
     const type = state.gradeType || 'classwork';
@@ -1311,7 +1311,7 @@ function renderGradeList(submissions, type) {
 
     const toggle = document.createElement('button');
     toggle.className = 'link-btn';
-    toggle.textContent = s.submission_text ? '▸ View text answer' : '(No text — file only)';
+    toggle.textContent = s.submission_text ? ' View text answer' : '(No text  file only)';
     toggle.disabled = !s.submission_text;
     const answerBox = document.createElement('div');
     answerBox.className = 'grade-row-answer hidden';
@@ -1319,7 +1319,7 @@ function renderGradeList(submissions, type) {
     if (s.submission_text) {
       toggle.addEventListener('click', () => {
         const hidden = answerBox.classList.toggle('hidden');
-        toggle.textContent = hidden ? '▸ View text answer' : '▾ Hide text answer';
+        toggle.textContent = hidden ? ' View text answer' : ' Hide text answer';
       });
     }
 
@@ -1328,7 +1328,7 @@ function renderGradeList(submissions, type) {
 
     const scoreInput = document.createElement('input');
     scoreInput.type = 'number'; scoreInput.min = 0; scoreInput.max = 10; scoreInput.step = 1;
-    scoreInput.className = 'input score-input'; scoreInput.placeholder = '0–10';
+    scoreInput.className = 'input score-input'; scoreInput.placeholder = '010';
     if (s.score !== null) scoreInput.value = String(s.score);
 
     const feedbackInput = document.createElement('input');
@@ -1342,22 +1342,22 @@ function renderGradeList(submissions, type) {
     saveBtn.addEventListener('click', async () => {
       const score = parseInt(scoreInput.value, 10);
       if (isNaN(score) || score < 0 || score > 10) {
-        $('gradeModalMsg').textContent = '⚠ Enter a score between 0 and 10.'; return;
+        $('gradeModalMsg').textContent = ' Enter a score between 0 and 10.'; return;
       }
-      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving';
       try {
         await api('/api/admin/grade', {
           method: 'PATCH',
           body: JSON.stringify({ submissionId: s.id, score, feedback: feedbackInput.value.trim() }),
         });
-        saveBtn.textContent = '✓ Saved';
+        saveBtn.textContent = ' Saved';
         card.classList.add('grade-row-graded');
         const badge = header.querySelector('[data-badge]');
         if (badge) { badge.textContent = score + '/10'; badge.className = 'grade-row-badge'; }
-        $('gradeModalMsg').textContent = `✅ Saved ${score}/10 for ${s.student_id}`;
+        $('gradeModalMsg').textContent = ` Saved ${score}/10 for ${s.student_id}`;
       } catch (e) {
         saveBtn.disabled = false; saveBtn.textContent = 'Retry';
-        $('gradeModalMsg').textContent = '⚠ ' + e.message;
+        $('gradeModalMsg').textContent = ' ' + e.message;
       }
     });
 
@@ -1369,15 +1369,15 @@ function renderGradeList(submissions, type) {
     if (s.submission_file_url) {
       const fileBtn = document.createElement('button');
       fileBtn.className = 'link-btn attach-file-link';
-      fileBtn.textContent = '📎 View attached file';
+      fileBtn.textContent = ' View attached file';
       fileBtn.addEventListener('click', async () => {
-        fileBtn.textContent = 'Opening…';
+        fileBtn.textContent = 'Opening';
         try {
           const { url } = await api(`/api/admin/file-url?path=${encodeURIComponent(s.submission_file_url)}`);
           window.open(url, '_blank', 'noopener');
         } catch (e) {
-          $('gradeModalMsg').textContent = '⚠ ' + e.message;
-        } finally { fileBtn.textContent = '📎 View attached file'; }
+          $('gradeModalMsg').textContent = ' ' + e.message;
+        } finally { fileBtn.textContent = ' View attached file'; }
       });
       card.appendChild(fileBtn);
     }
@@ -1388,7 +1388,7 @@ function renderGradeList(submissions, type) {
   });
 }
 
-// ── Admin: Student questions panel ───────────────────────────────────────────
+//  Admin: Student questions panel 
 let loadedQuestions = [];
 
 async function openQuestionsModal() {
@@ -1413,7 +1413,7 @@ async function openQuestionsModal() {
 
 async function loadQuestions() {
   const subject = $('questionsSubjectPick').value;
-  $('questionsList').innerHTML = '<p style="color:var(--muted)">Loading…</p>';
+  $('questionsList').innerHTML = '<p style="color:var(--muted)">Loading</p>';
   $('questionsModalMsg').textContent = '';
   try {
     const url = '/api/admin/questions' + (subject ? `?subject=${encodeURIComponent(subject)}` : '');
@@ -1442,7 +1442,7 @@ function renderQuestionsList(questions) {
     const when = new Date(q.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     header.innerHTML =
       `<span class="grade-row-id">${escapeHtml(q.student_id)}</span>` +
-      `<span class="grade-row-badge grade-row-badge-muted">${escapeHtml(cap(q.subject))} · ${when}</span>`;
+      `<span class="grade-row-badge grade-row-badge-muted">${escapeHtml(cap(q.subject))}  ${when}</span>`;
 
     card.appendChild(header);
 
@@ -1457,15 +1457,15 @@ function renderQuestionsList(questions) {
     if (q.question_file_url) {
       const fileBtn = document.createElement('button');
       fileBtn.className = 'link-btn attach-file-link';
-      fileBtn.textContent = '📎 View attached file';
+      fileBtn.textContent = ' View attached file';
       fileBtn.addEventListener('click', async () => {
-        fileBtn.textContent = 'Opening…';
+        fileBtn.textContent = 'Opening';
         try {
           const { url } = await api(`/api/admin/file-url?path=${encodeURIComponent(q.question_file_url)}`);
           window.open(url, '_blank', 'noopener');
         } catch (e) {
-          $('questionsModalMsg').textContent = '⚠ ' + e.message;
-        } finally { fileBtn.textContent = '📎 View attached file'; }
+          $('questionsModalMsg').textContent = ' ' + e.message;
+        } finally { fileBtn.textContent = ' View attached file'; }
       });
       card.appendChild(fileBtn);
     }
@@ -1476,16 +1476,16 @@ function renderQuestionsList(questions) {
 
 function downloadQuestions() {
   if (!loadedQuestions.length) {
-    $('questionsModalMsg').textContent = '⚠ Load questions first.';
+    $('questionsModalMsg').textContent = ' Load questions first.';
     return;
   }
   const lines = loadedQuestions.map((q) => {
     const when = new Date(q.submitted_at).toLocaleString();
     const text = q.question_text ? `\n${q.question_text}` : '';
     const file = q.question_file_url ? `\n[Attached file: ${q.question_file_url.split('/').pop()}]` : '';
-    return `Student: ${q.student_id}\nSubject: ${q.subject}\nTime: ${when}${text}${file}\n${'─'.repeat(50)}`;
+    return `Student: ${q.student_id}\nSubject: ${q.subject}\nTime: ${when}${text}${file}\n${''.repeat(50)}`;
   });
-  const content = `Student Questions — ${new Date().toLocaleDateString()}\n${'═'.repeat(50)}\n\n` + lines.join('\n\n');
+  const content = `Student Questions  ${new Date().toLocaleDateString()}\n${''.repeat(50)}\n\n` + lines.join('\n\n');
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1495,7 +1495,7 @@ function downloadQuestions() {
   URL.revokeObjectURL(url);
 }
 
-// ── Admin: Set student password ───────────────────────────────────────────────
+//  Admin: Set student password 
 function openPasswordModal() {
   $('passwordEmail').value = '';
   $('passwordNew').value = '';
@@ -1512,25 +1512,25 @@ async function savePassword() {
   if (!email || !password) { msg.textContent = 'Enter both email and new password.'; return; }
   if (password.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; return; }
   const btn = $('passwordSaveBtn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.textContent = 'Saving';
   try {
     await api('/api/admin/set-password', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
     msg.style.color = 'var(--green, #4ade80)';
-    msg.textContent = `✅ Password updated for ${email}.`;
+    msg.textContent = ` Password updated for ${email}.`;
     $('passwordEmail').value = '';
     $('passwordNew').value = '';
   } catch (e) {
     msg.style.color = '';
-    msg.textContent = '⚠ ' + e.message;
+    msg.textContent = ' ' + e.message;
   } finally {
     btn.disabled = false; btn.textContent = 'Set Password';
   }
 }
 
-// ── Admin: Outlines upload ────────────────────────────────────────────────────
+//  Admin: Outlines upload 
 function openOutlines() {
   $('outlinesMsg').textContent = '';
   $('outlinesModal').classList.remove('hidden');
@@ -1543,7 +1543,7 @@ function uploadOutlines() {
   const msg = $('outlinesMsg');
   if (!file) { msg.textContent = 'Choose a CSV file first.'; return; }
   if (typeof Papa === 'undefined') { msg.textContent = 'CSV parser not loaded.'; return; }
-  msg.textContent = 'Parsing…';
+  msg.textContent = 'Parsing';
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
@@ -1559,46 +1559,46 @@ function uploadOutlines() {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || `Upload failed (${res.status})`);
-        msg.textContent = `✅ Imported ${data.imported} day(s) for: ${(data.subjects || []).join(', ')}.`;
+        msg.textContent = ` Imported ${data.imported} day(s) for: ${(data.subjects || []).join(', ')}.`;
       } catch (e) {
-        msg.textContent = '⚠ ' + e.message;
+        msg.textContent = ' ' + e.message;
       }
     },
-    error: (err) => { msg.textContent = '⚠ ' + err.message; },
+    error: (err) => { msg.textContent = ' ' + err.message; },
   });
 }
 
 async function resetAllLessons() {
   if (!confirm(
-    '⚠️ Reset ALL lessons?\n\n' +
+    ' Reset ALL lessons?\n\n' +
     'This permanently deletes every lesson record. Students will see no class until you generate or demo Day 1 again.\n\n' +
-    'The curriculum (your uploaded CSV) is NOT affected — Day 1 will use your proper outline topics.\n\n' +
+    'The curriculum (your uploaded CSV) is NOT affected  Day 1 will use your proper outline topics.\n\n' +
     'Are you sure?'
   )) return;
   const btn = $('adminResetBtn');
   const prev = btn.textContent;
   btn.disabled = true;
-  btn.textContent = 'Resetting…';
+  btn.textContent = 'Resetting';
   try {
     const data = await api('/api/admin/reset-lessons', { method: 'DELETE' });
-    alert(`✅ Done — ${data.deleted} lesson record(s) cleared. Click "Open Class" → "Regenerate" or "Demo" to start from Day 1.`);
+    alert(` Done  ${data.deleted} lesson record(s) cleared. Click "Open Class"  "Regenerate" or "Demo" to start from Day 1.`);
     // Reload classroom view so the "no lesson yet" state shows
     if (typeof loadClassroom === 'function') await loadClassroom();
   } catch (e) {
-    alert('⚠ Reset failed: ' + e.message);
+    alert(' Reset failed: ' + e.message);
   } finally {
     btn.disabled = false;
     btn.textContent = prev;
   }
 }
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+//  Utilities 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-// ── Wire events ───────────────────────────────────────────────────────────────
+//  Wire events 
 function wireEvents() {
   // Lock scroll while login overlay is visible
   document.documentElement.style.overflow = 'hidden';
@@ -1633,34 +1633,34 @@ function wireEvents() {
   wireQuestionFile();
   $('submitQuestionBtn').addEventListener('click', submitQuestion);
 
-  // Admin — Open Class modal
+  // Admin  Open Class modal
   $('adminClassBtn').addEventListener('click', openClassModal);
   $('classModalClose').addEventListener('click', () => $('classModal').classList.add('hidden'));
 
-  // Admin — Grade modal
+  // Admin  Grade modal
   $('adminGradeBtn').addEventListener('click', openGradeModal);
   $('gradeModalClose').addEventListener('click', () => $('gradeModal').classList.add('hidden'));
   $('gradeLoadBtn').addEventListener('click', loadGradeSubmissions);
   $('gradeTabClasswork').addEventListener('click', () => { setGradeTab('classwork'); });
   $('gradeTabAssignment').addEventListener('click', () => { setGradeTab('assignment'); });
 
-  // Admin — Questions modal
+  // Admin  Questions modal
   $('adminQuestionsBtn').addEventListener('click', openQuestionsModal);
   $('questionsModalClose').addEventListener('click', () => $('questionsModal').classList.add('hidden'));
   $('questionsLoadBtn').addEventListener('click', loadQuestions);
   $('questionsDownloadBtn').addEventListener('click', downloadQuestions);
 
-  // Admin — Password
+  // Admin  Password
   $('adminPasswordBtn').addEventListener('click', openPasswordModal);
   $('passwordModalClose').addEventListener('click', () => $('passwordModal').classList.add('hidden'));
   $('passwordSaveBtn').addEventListener('click', savePassword);
 
-  // Admin — Outlines
+  // Admin  Outlines
   $('adminOutlinesBtn').addEventListener('click', openOutlines);
   $('outlinesClose').addEventListener('click', closeOutlines);
   $('outlinesUploadBtn').addEventListener('click', uploadOutlines);
 
-  // Admin — Reset all lessons
+  // Admin  Reset all lessons
   $('adminResetBtn').addEventListener('click', resetAllLessons);
 
   // Logout
