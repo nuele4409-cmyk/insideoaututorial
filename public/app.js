@@ -1191,12 +1191,26 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
     const goesLiveAt = new Date(input.value).toISOString();
     goBtn.disabled = true;
     cancelBtn.disabled = true;
-    goBtn.textContent = 'Generating…';
+
+    // Show elapsed time so the admin knows it's working (generation takes 1-3 min)
+    const start = Date.now();
+    let elapsedTimer = setInterval(() => {
+      const secs = Math.floor((Date.now() - start) / 1000);
+      const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+      const ss = String(secs % 60).padStart(2, '0');
+      goBtn.textContent = `Generating… ${mm}:${ss}`;
+    }, 1000);
+    goBtn.textContent = 'Generating… 00:00';
+    msg.textContent = '⏳ Claude is writing the lesson — this takes 1–3 minutes. Please wait.';
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 360_000); // 6-min hard limit
 
     try {
       const { lesson, isNew } = await api('/api/lessons/generate', {
         method: 'POST',
         body: JSON.stringify({ subject, department, goes_live_at: goesLiveAt }),
+        signal: controller.signal,
       });
       const liveTimeStr = new Date(goesLiveAt).toLocaleString();
       if (isNew) {
@@ -1210,10 +1224,14 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
         goBtn.textContent = 'Generate & Schedule';
       }
     } catch (e) {
-      msg.textContent = '⚠ ' + e.message;
+      const errMsg = e.name === 'AbortError' ? 'Generation timed out — try again or check Railway logs.' : e.message;
+      msg.textContent = '⚠ ' + errMsg;
       goBtn.disabled = false;
       cancelBtn.disabled = false;
       goBtn.textContent = 'Generate & Schedule';
+    } finally {
+      clearInterval(elapsedTimer);
+      clearTimeout(timeout);
     }
   });
 }

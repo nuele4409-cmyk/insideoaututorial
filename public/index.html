@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#06070F" />
   <meta name="color-scheme" content="dark" />
-  <title>Virtual Tutorial — Post-UTME</title>
+  <title>Virtual Tutorial â€” Post-UTME</title>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -41,11 +41,11 @@
 </head>
 <body class="s-dark">
 
-  <!-- ── Login overlay ───────────────────────────────────────────────────────── -->
+  <!-- â”€â”€ Login overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="loginOverlay" class="login-overlay">
     <div class="login-box">
       <div class="login-brand">
-        <span class="brand-mark">🏫</span>
+        <span class="brand-mark">ðŸ«</span>
         <h1>Virtual <span class="grad">Tutorial</span></h1>
       </div>
       <p class="login-sub">Sign in with your Inside OAU! account</p>
@@ -58,26 +58,26 @@
 
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark">🏫</div>
+      <div class="brand-mark">ðŸ«</div>
       <div class="brand-text">
         <h1>Virtual <span class="grad">Tutorial</span></h1>
         <p>Post-UTME Virtual Classroom</p>
       </div>
     </div>
     <div class="topbar-right">
-      <button id="adminClassBtn" class="admin-btn" hidden>📋 Open Class</button>
-      <button id="adminGradeBtn" class="admin-btn" hidden>📝 Grade</button>
-      <button id="adminQuestionsBtn" class="admin-btn" hidden>📬 Questions</button>
-      <button id="adminOutlinesBtn" class="admin-btn" hidden>📚 Outlines</button>
-      <button id="adminPasswordBtn" class="admin-btn" hidden>🔑 Password</button>
-      <button id="adminResetBtn" class="admin-btn admin-btn-danger" hidden>🗑 Reset</button>
+      <button id="adminClassBtn" class="admin-btn" hidden>ðŸ“‹ Open Class</button>
+      <button id="adminGradeBtn" class="admin-btn" hidden>ðŸ“ Grade</button>
+      <button id="adminQuestionsBtn" class="admin-btn" hidden>ðŸ“¬ Questions</button>
+      <button id="adminOutlinesBtn" class="admin-btn" hidden>ðŸ“š Outlines</button>
+      <button id="adminPasswordBtn" class="admin-btn" hidden>ðŸ”‘ Password</button>
+      <button id="adminResetBtn" class="admin-btn admin-btn-danger" hidden>ðŸ—‘ Reset</button>
       <button id="logoutBtn" class="logout-btn" hidden>Log out</button>
       <div id="modeBadge" class="badge badge-muted" style="display:none"></div>
     </div>
   </header>
 
   <main class="layout">
-    <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+    <!-- â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <aside class="sidebar">
       <section class="card">
         <label class="field-label" for="studentSelect">Student</label>
@@ -100,26 +100,26 @@
 
       <section class="card status-card">
         <div class="card-title">Today's Progress</div>
-        <div class="status-row"><span>Day</span><strong id="statDay">—</strong></div>
-        <div class="status-row"><span>Topic</span><strong id="statTopic">—</strong></div>
-        <div class="status-row"><span>Score</span><strong id="statScore">—</strong></div>
-        <div class="status-row"><span>Submitted</span><strong id="statSubmitted">—</strong></div>
+        <div class="status-row"><span>Day</span><strong id="statDay">â€”</strong></div>
+        <div class="status-row"><span>Topic</span><strong id="statTopic">â€”</strong></div>
+        <div class="status-row"><span>Score</span><strong id="statScore">â€”</strong></div>
+        <div class="status-row"><span>Submitted</span><strong id="statSubmitted">â€”</strong></div>
       </section>
 
       <section class="card announce-card">
-        <div class="announce-label">📣 Upcoming Event</div>
-        <p id="announceText">—</p>
-        <a id="announceLink" class="announce-link" target="_blank" rel="noopener" hidden>Go to event →</a>
+        <div class="announce-label">ðŸ“£ Upcoming Event</div>
+        <p id="announceText">â€”</p>
+        <a id="announceLink" class="announce-link" target="_blank" rel="noopener" hidden>Go to event â†’</a>
       </section>
     </aside>
 
-    <!-- ── Classroom ────────────────────────────────────────────────────────── -->
+    <!-- â”€â”€ Classroom â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <section class="classroom">
       <div id="classroomBanner" class="banner hidden"></div>
 
       <!-- No lesson yet -->
       <div id="noLesson" class="no-lesson-card">
-        <div class="no-lesson-icon">📭</div>
+        <div class="no-lesson-icon">ðŸ“­</div>
         <h2>Waiting for class to open</h2>
         <p>Select a subject. When the admin opens today's class, the lesson will appear here.</p>
       </div>
@@ -128,16 +128,16 @@
       <div id="lessonView" class="lesson-view hidden">
 
         <div class="lesson-header">
-          <span class="lesson-day-tag" id="lessonDayTag">Day —</span>
-          <h2 class="lesson-topic" id="lessonTopic">—</h2>
+          <span class="lesson-day-tag" id="lessonDayTag">Day â€”</span>
+          <h2 class="lesson-topic" id="lessonTopic">â€”</h2>
         </div>
 
         <div class="lesson-body" id="lessonBody"></div>
 
-        <!-- ── CLASSWORK ──────────────────────────────────────────────────── -->
-        <!-- Classwork card — appears after lesson reveals -->
+        <!-- â”€â”€ CLASSWORK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+        <!-- Classwork card â€” appears after lesson reveals -->
         <div id="classworkCard" class="assignment-card classwork-card hidden">
-          <div class="assignment-label">✏️ Classwork</div>
+          <div class="assignment-label">âœï¸ Classwork</div>
           <div id="classworkText" class="assignment-text"></div>
         </div>
 
@@ -148,23 +148,23 @@
             id="classworkInput"
             class="answer-input"
             rows="5"
-            placeholder="Answer the classwork question here — or attach a photo below."
+            placeholder="Answer the classwork question here â€” or attach a photo below."
           ></textarea>
           <div class="attach-row">
             <label class="attach-btn" for="classworkFile">
-              📎 Attach image or PDF
+              ðŸ“Ž Attach image or PDF
               <input id="classworkFile" type="file" accept="image/*,application/pdf" style="display:none" />
             </label>
             <span id="classworkAttachName" class="attach-name"></span>
-            <button id="classworkAttachClear" class="link-btn attach-clear hidden" type="button">✕ Remove</button>
+            <button id="classworkAttachClear" class="link-btn attach-clear hidden" type="button">âœ• Remove</button>
           </div>
           <button id="classworkSubmitBtn" class="btn btn-accent submit-btn" type="button">Submit Classwork</button>
         </div>
 
         <!-- Classwork: submitted, awaiting grade -->
         <div id="classworkAwaitingSection" class="awaiting-section hidden">
-          <div class="awaiting-icon">⏳</div>
-          <p>Classwork submitted — your teacher will grade it soon.</p>
+          <div class="awaiting-icon">â³</div>
+          <p>Classwork submitted â€” your teacher will grade it soon.</p>
           <button id="classworkRefreshBtn" class="btn btn-secondary" type="button">Check for result</button>
         </div>
 
@@ -172,7 +172,7 @@
         <div id="classworkGradeSection" class="grade-section hidden">
           <div class="grade-header">Classwork Result</div>
           <div class="grade-score-row">
-            <span class="grade-number" id="classworkGradeNumber">—</span>
+            <span class="grade-number" id="classworkGradeNumber">â€”</span>
             <span class="grade-denom">/10</span>
             <div class="grade-bar-wrap">
               <div class="grade-bar" id="classworkGradeBar"></div>
@@ -181,10 +181,10 @@
           <div class="grade-feedback" id="classworkGradeFeedback"></div>
         </div>
 
-        <!-- ── ASSIGNMENT ──────────────────────────────────────────────────── -->
-        <!-- Assignment card — hidden until reveal reaches it -->
+        <!-- â”€â”€ ASSIGNMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+        <!-- Assignment card â€” hidden until reveal reaches it -->
         <div id="assignmentCard" class="assignment-card hidden">
-          <div class="assignment-label">📝 Assignment</div>
+          <div class="assignment-label">ðŸ“ Assignment</div>
           <div id="assignmentText" class="assignment-text"></div>
         </div>
 
@@ -195,17 +195,17 @@
             id="answerInput"
             class="answer-input"
             rows="6"
-            placeholder="Type your answer here — or attach a photo/scan below. You can do both."
+            placeholder="Type your answer here â€” or attach a photo/scan below. You can do both."
           ></textarea>
 
           <!-- File attachment -->
           <div class="attach-row">
             <label class="attach-btn" for="answerFile">
-              📎 Attach image or PDF
+              ðŸ“Ž Attach image or PDF
               <input id="answerFile" type="file" accept="image/*,application/pdf" style="display:none" />
             </label>
             <span id="attachName" class="attach-name"></span>
-            <button id="attachClear" class="link-btn attach-clear hidden" type="button">✕ Remove</button>
+            <button id="attachClear" class="link-btn attach-clear hidden" type="button">âœ• Remove</button>
           </div>
 
           <button id="submitBtn" class="btn btn-accent submit-btn" type="button">Submit Assignment</button>
@@ -213,8 +213,8 @@
 
         <!-- Submitted, awaiting grade -->
         <div id="awaitingSection" class="awaiting-section hidden">
-          <div class="awaiting-icon">⏳</div>
-          <p>Assignment submitted — your teacher will grade it soon.</p>
+          <div class="awaiting-icon">â³</div>
+          <p>Assignment submitted â€” your teacher will grade it soon.</p>
           <button id="refreshGradeBtn" class="btn btn-secondary" type="button">Check for result</button>
         </div>
 
@@ -222,7 +222,7 @@
         <div id="gradeSection" class="grade-section hidden">
           <div class="grade-header">Assignment Result</div>
           <div class="grade-score-row">
-            <span class="grade-number" id="gradeNumber">—</span>
+            <span class="grade-number" id="gradeNumber">â€”</span>
             <span class="grade-denom">/10</span>
             <div class="grade-bar-wrap">
               <div class="grade-bar" id="gradeBar"></div>
@@ -231,11 +231,11 @@
           <div class="grade-feedback" id="gradeFeedback"></div>
         </div>
 
-        <!-- Question section — appears after reveal, always visible post-lesson -->
+        <!-- Question section â€” appears after reveal, always visible post-lesson -->
         <div id="questionSection" class="question-section hidden">
           <div class="question-divider">That's a wrap for today's class</div>
           <div class="question-header">
-            <span class="question-icon">❓</span>
+            <span class="question-icon">â“</span>
             <div>
               <div class="question-title">Got a question from today's lesson?</div>
               <div class="question-sub">Send it here. We will answer it in our WhatsApp group.</div>
@@ -245,18 +245,18 @@
             id="questionInput"
             class="answer-input question-input"
             rows="3"
-            placeholder="Type your question here…"
+            placeholder="Type your question hereâ€¦"
           ></textarea>
           <div class="attach-row">
             <label class="attach-btn" for="questionFile">
-              📎 Attach file (optional)
+              ðŸ“Ž Attach file (optional)
               <input id="questionFile" type="file" accept="image/*,application/pdf" style="display:none" />
             </label>
             <span id="questionAttachName" class="attach-name"></span>
-            <button id="questionAttachClear" class="link-btn attach-clear hidden" type="button">✕ Remove</button>
+            <button id="questionAttachClear" class="link-btn attach-clear hidden" type="button">âœ• Remove</button>
           </div>
           <div id="questionSubmittedMsg" class="question-sent hidden">
-            ✓ Question sent — watch the WhatsApp group for the answer.
+            âœ“ Question sent â€” watch the WhatsApp group for the answer.
           </div>
           <button id="submitQuestionBtn" class="btn btn-secondary submit-question-btn" type="button">
             Send Question
@@ -267,12 +267,12 @@
     </section>
   </main>
 
-  <!-- ── Admin: Open Class modal ─────────────────────────────────────────────── -->
+  <!-- â”€â”€ Admin: Open Class modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="classModal" class="modal-overlay hidden">
     <div class="modal-box modal-box-wide">
       <div class="modal-head">
-        <h2>📋 Open Today's Classes</h2>
-        <button id="classModalClose" class="modal-close" aria-label="Close">✕</button>
+        <h2>ðŸ“‹ Open Today's Classes</h2>
+        <button id="classModalClose" class="modal-close" aria-label="Close">âœ•</button>
       </div>
       <p class="modal-sub">
         Generate a shared lesson for each subject. Students see it immediately. Each lesson costs one AI call.
@@ -282,22 +282,22 @@
     </div>
   </div>
 
-  <!-- ── Admin: Manual grading panel ───────────────────────────────────────────── -->
+  <!-- â”€â”€ Admin: Manual grading panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="gradeModal" class="modal-overlay hidden">
     <div class="modal-box modal-box-wide">
       <div class="modal-head">
-        <h2>📝 Grade Submissions</h2>
-        <button id="gradeModalClose" class="modal-close" aria-label="Close">✕</button>
+        <h2>ðŸ“ Grade Submissions</h2>
+        <button id="gradeModalClose" class="modal-close" aria-label="Close">âœ•</button>
       </div>
       <p class="modal-sub">
-        Review each student's answer and enter a score (0–10) with brief feedback. Hit Save for each row.
+        Review each student's answer and enter a score (0â€“10) with brief feedback. Hit Save for each row.
       </p>
       <div class="grade-picker-row">
         <label class="field-label" for="gradeSubjectPick">Subject</label>
         <select id="gradeSubjectPick" class="select grade-subject-select"></select>
         <div class="grade-type-tabs">
-          <button id="gradeTabClasswork" class="grade-tab grade-tab-active" data-type="classwork">✏️ Classwork</button>
-          <button id="gradeTabAssignment" class="grade-tab" data-type="assignment">📝 Assignment</button>
+          <button id="gradeTabClasswork" class="grade-tab grade-tab-active" data-type="classwork">âœï¸ Classwork</button>
+          <button id="gradeTabAssignment" class="grade-tab" data-type="assignment">ðŸ“ Assignment</button>
         </div>
         <button id="gradeLoadBtn" class="btn btn-secondary btn-sm">Load submissions</button>
       </div>
@@ -306,12 +306,12 @@
     </div>
   </div>
 
-  <!-- ── Admin: Student questions panel ─────────────────────────────────────── -->
+  <!-- â”€â”€ Admin: Student questions panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="questionsModal" class="modal-overlay hidden">
     <div class="modal-box modal-box-wide">
       <div class="modal-head">
-        <h2>📬 Student Questions</h2>
-        <button id="questionsModalClose" class="modal-close" aria-label="Close">✕</button>
+        <h2>ðŸ“¬ Student Questions</h2>
+        <button id="questionsModalClose" class="modal-close" aria-label="Close">âœ•</button>
       </div>
       <p class="modal-sub">
         Questions submitted after today's lessons. Answer them in the WhatsApp group.
@@ -322,38 +322,38 @@
           <option value="">All subjects</option>
         </select>
         <button id="questionsLoadBtn" class="btn btn-secondary btn-sm">Load</button>
-        <button id="questionsDownloadBtn" class="btn btn-secondary btn-sm" style="margin-left:auto">📥 Download</button>
+        <button id="questionsDownloadBtn" class="btn btn-secondary btn-sm" style="margin-left:auto">ðŸ“¥ Download</button>
       </div>
       <div id="questionsList" class="grade-list"></div>
       <div id="questionsModalMsg" class="modal-msg"></div>
     </div>
   </div>
 
-  <!-- ── Admin: upload course outlines ───────────────────────────────────────── -->
+  <!-- â”€â”€ Admin: upload course outlines â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="outlinesModal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <h2>📚 Upload course outlines</h2>
-        <button id="outlinesClose" class="modal-close" aria-label="Close">✕</button>
+        <h2>ðŸ“š Upload course outlines</h2>
+        <button id="outlinesClose" class="modal-close" aria-label="Close">âœ•</button>
       </div>
       <p class="modal-sub">
         CSV with columns <code>subject, day, topic, outline</code>. The <code>subject</code> must match the
         app's keys (physics, chemistry, biology, mathematics, economics, government, literature,
-        geography, history, agric, crs, irs, further_maths…). A row replaces that subject+day.
+        geography, history, agric, crs, irs, further_mathsâ€¦). A row replaces that subject+day.
       </p>
-      <a class="modal-template" href="/outline_template.csv" download>⬇ Download template CSV</a>
+      <a class="modal-template" href="/outline_template.csv" download>â¬‡ Download template CSV</a>
       <input type="file" id="outlinesFile" accept=".csv,text/csv" class="modal-file" />
       <button id="outlinesUploadBtn" class="btn btn-primary modal-upload">Upload outlines</button>
       <div id="outlinesMsg" class="modal-msg"></div>
     </div>
   </div>
 
-  <!-- ── Admin: set student password ─────────────────────────────────────────── -->
+  <!-- â”€â”€ Admin: set student password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="passwordModal" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <h2>🔑 Set Student Password</h2>
-        <button id="passwordModalClose" class="modal-close" aria-label="Close">✕</button>
+        <h2>ðŸ”‘ Set Student Password</h2>
+        <button id="passwordModalClose" class="modal-close" aria-label="Close">âœ•</button>
       </div>
       <p class="modal-sub">Enter the student's email and a new password. This updates their account on both the tutorial app and the CBT app.</p>
       <input id="passwordEmail" class="auth-input" type="email" placeholder="Student email address" autocomplete="off" />
@@ -363,6 +363,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=13"></script>
+  <script src="/app.js?v=14"></script>
 </body>
 </html>
