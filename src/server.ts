@@ -74,7 +74,8 @@ app.get('/api/health', (_req, res) => {
 
 app.get(
   '/api/students',
-  wrap(async (_req, res) => {
+  wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     res.json(await repo.listStudents());
   }),
 );
@@ -82,6 +83,7 @@ app.get(
 app.post(
   '/api/students',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const { full_name, department } = req.body ?? {};
     if (!full_name || !department) {
       res.status(400).json({ error: 'full_name and department are required.' });
@@ -94,6 +96,7 @@ app.post(
 app.get(
   '/api/students/:id',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const student = await repo.getStudent(req.params.id);
     if (!student) {
       res.status(404).json({ error: 'Student not found.' });
@@ -114,6 +117,7 @@ app.get(
 app.get(
   '/api/curriculum',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const department = String(req.query.department ?? '');
     const subject = String(req.query.subject ?? '');
     res.json(await repo.listCurriculum(department, subject));
@@ -130,6 +134,7 @@ app.get(
 app.post(
   '/api/announcement',
   wrap(async (req, res) => {
+    if (!(await requireAdmin(req))) { res.status(403).json({ error: 'Admin only.' }); return; }
     const message = String(req.body?.message ?? '').trim();
     const link = req.body?.link ? String(req.body.link).trim() : null;
     if (!message) {
@@ -143,6 +148,7 @@ app.post(
 app.get(
   '/api/history',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const studentId = String(req.query.studentId ?? '');
     const subject = String(req.query.subject ?? '');
     const history = await repo.getVisibleHistory(studentId, subject);
@@ -160,6 +166,7 @@ app.get(
 app.post(
   '/api/sessions/start',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const { studentId, subject } = req.body ?? {};
     if (!studentId || !subject) {
       res.status(400).json({ error: 'studentId and subject are required.' });
@@ -177,6 +184,7 @@ app.post(
 app.post(
   '/api/sessions/message',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const { studentId, subject, text } = req.body ?? {};
     if (!studentId || !subject || !text) {
       res.status(400).json({ error: 'studentId, subject and text are required.' });
@@ -285,6 +293,14 @@ app.get(
     }
   }),
 );
+
+/** Verify the Bearer token and return the userId, or null if invalid. */
+async function requireAuth(req: Request): Promise<string | null> {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) return null;
+  const v = await cbt.verifyToken(header.slice(7));
+  return v?.userId ?? null;
+}
 
 // Admin-only: verify the caller's Supabase token belongs to an admin profile.
 async function requireAdmin(req: Request): Promise<boolean> {
@@ -473,6 +489,7 @@ app.post(
 app.get(
   '/api/lessons/today',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const subject = String(req.query.subject ?? '').trim().toLowerCase();
     const department = String(req.query.department ?? 'general').trim().toLowerCase();
     if (!subject) {
@@ -489,6 +506,7 @@ app.get(
 app.get(
   '/api/lessons/next-scheduled',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const subject = String(req.query.subject ?? '').trim().toLowerCase();
     const department = String(req.query.department ?? 'general').trim().toLowerCase();
     if (!subject) {
@@ -504,6 +522,7 @@ app.get(
 app.get(
   '/api/lessons/status',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const date = String(req.query.date ?? todayWAT());
     const tracks = await repo.getLessonStatus(date);
     res.json({ date, tracks });
@@ -514,6 +533,7 @@ app.get(
 app.post(
   '/api/questions',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const { studentId, subject, department, questionText, fileUrl } = req.body ?? {};
     if (!studentId || !subject || !department || (!questionText && !fileUrl)) {
       res.status(400).json({ error: 'studentId, subject, department, and at least one of questionText or fileUrl are required.' });
@@ -550,6 +570,7 @@ app.get(
 app.post(
   '/api/submissions/upload-file',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const { dataUrl, filename } = req.body ?? {};
     if (!dataUrl || !filename) {
       res.status(400).json({ error: 'dataUrl and filename are required.' });
@@ -592,6 +613,7 @@ app.get(
 app.post(
   '/api/submissions',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const { studentId, subject, department, text, fileUrl } = req.body ?? {};
     if (!studentId || !subject || (!text && !fileUrl)) {
       res.status(400).json({ error: 'studentId, subject, and at least one of text or fileUrl are required.' });
@@ -607,6 +629,7 @@ app.post(
 app.post(
   '/api/classwork',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const { studentId, subject, department, text, fileUrl } = req.body ?? {};
     if (!studentId || !subject || (!text && !fileUrl)) {
       res.status(400).json({ error: 'studentId, subject, and at least one of text or fileUrl are required.' });
@@ -622,6 +645,7 @@ app.post(
 app.get(
   '/api/classwork/mine',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const studentId = String(req.query.studentId ?? '');
     const subject = String(req.query.subject ?? '').toLowerCase();
     const date = String(req.query.date ?? todayWAT());
@@ -677,6 +701,7 @@ app.patch(
 app.get(
   '/api/submissions/mine',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const studentId = String(req.query.studentId ?? '');
     const subject = String(req.query.subject ?? '').toLowerCase();
     const date = String(req.query.date ?? todayWAT());
@@ -693,6 +718,7 @@ app.get(
 app.get(
   '/api/submissions/history',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const studentId = String(req.query.studentId ?? '').trim();
     const subject = String(req.query.subject ?? '').trim().toLowerCase();
     if (!studentId || !subject) {
@@ -731,6 +757,7 @@ app.post(
 app.get(
   '/api/lessons/archive',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const subject = String(req.query.subject ?? '').trim().toLowerCase();
     const department = String(req.query.department ?? 'general').trim().toLowerCase();
     const day = req.query.day ? Number(req.query.day) : null;
@@ -749,6 +776,7 @@ app.get(
 app.get(
   '/api/progress/overview',
   wrap(async (req, res) => {
+    if (!(await requireAuth(req))) { res.status(401).json({ error: 'Authentication required.' }); return; }
     const studentId = String(req.query.studentId ?? '').trim();
     if (!studentId) { res.status(400).json({ error: 'studentId is required.' }); return; }
     const student = await repo.getStudent(studentId);
