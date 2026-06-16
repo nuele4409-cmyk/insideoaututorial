@@ -143,6 +143,9 @@ function revealKey(dayNumber) {
 async function loadClassroom() {
   if (!state.student || !state.subject) return;
 
+  // Cancel any pending no-lesson poll so it doesn't re-trigger during animation
+  if (_pollTimer) { clearTimeout(_pollTimer); _pollTimer = null; }
+
   showClassroomBanner('Loading today\'s class', 'muted');
   $('noLesson').classList.add('hidden');
   $('lessonView').classList.add('hidden');
