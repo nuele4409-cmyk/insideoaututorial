@@ -260,6 +260,8 @@ async function revealLesson(lesson, instant) {
 
   const blocks = parseSections(lesson.lesson_content);
 
+  const classroom = body.closest('.classroom') || body.parentElement;
+
   if (instant) {
     for (const block of blocks) {
       if (block.type === 'section') {
@@ -268,8 +270,8 @@ async function revealLesson(lesson, instant) {
         appendCheckGate(body, block.text);
       }
     }
-    // Batch-render all equations at once for instant reveal
-    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([body]).catch(() => {});
+    // Typeset after MathJax is ready (async script may still be loading)
+    typesetEl(body);
     return;
   }
 
@@ -283,7 +285,8 @@ async function revealLesson(lesson, instant) {
         const delay = (block.num === 1 && i === 0) ? 1000 : 25000;
         await sleep(delay);
         appendPara(body, block.paragraphs[i], true);
-        body.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Scroll the classroom container to the bottom to reveal new paragraph
+        if (classroom) classroom.scrollTo({ top: classroom.scrollHeight, behavior: 'smooth' });
       }
     } else if (block.type === 'check') {
       await sleep(1500);
@@ -300,8 +303,7 @@ function appendPara(container, text, animate) {
   if (animate) p.classList.add('para-reveal');
   p.textContent = text;
   container.appendChild(p);
-  // Render any LaTeX in this paragraph
-  if (window.MathJax?.typesetPromise) MathJax.typesetPromise([p]).catch(() => {});
+  typesetEl(p);
 }
 
 //  Checkpoint gates 
@@ -323,7 +325,7 @@ function showCheckpointGate(container, question) {
     });
     container.appendChild(gate);
     gate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([gate]).catch(() => {});
+    typesetEl(gate);
   });
 }
 
@@ -1591,6 +1593,25 @@ async function resetAllLessons() {
     btn.disabled = false;
     btn.textContent = prev;
   }
+}
+
+//  MathJax helper: waits for async script to load before typesetting
+function typesetEl(el) {
+  if (!window.MathJax) return;
+  if (typeof MathJax.typesetPromise === 'function') {
+    MathJax.typesetPromise([el]).catch(() => {});
+    return;
+  }
+  // MathJax config exists but library hasn't loaded yet — poll
+  let attempts = 0;
+  const poll = setInterval(() => {
+    if (typeof MathJax.typesetPromise === 'function') {
+      clearInterval(poll);
+      MathJax.typesetPromise([el]).catch(() => {});
+    } else if (++attempts > 30) {
+      clearInterval(poll);
+    }
+  }, 300);
 }
 
 //  Student: My Progress
