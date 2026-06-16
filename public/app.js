@@ -1292,7 +1292,7 @@ function renderGradeList(submissions, type) {
   list.innerHTML = '';
   if (!submissions.length) {
     const typeLabel = type === 'classwork' ? 'classwork' : 'assignment';
-    list.innerHTML = `<p style="color:var(--muted)">No ${typeLabel} submissions yet for this subject today.</p>`;
+    list.innerHTML = `<p style="color:var(--muted)">No ${typeLabel} submissions yet for this subject.</p>`;
     return;
   }
 
@@ -1304,8 +1304,9 @@ function renderGradeList(submissions, type) {
     header.className = 'grade-row-header';
     const badgeText = s.score !== null ? `${s.score}/10` : 'ungraded';
     const badgeClass = s.score !== null ? 'grade-row-badge' : 'grade-row-badge grade-row-badge-muted';
+    const dayLabel = s.day_number ? `<span style="font-size:11px;color:var(--dim);margin-left:6px;">Day ${s.day_number} · ${s.lesson_date || ''}</span>` : '';
     header.innerHTML =
-      `<span class="grade-row-id">${escapeHtml(s.student_id)}</span>` +
+      `<span class="grade-row-id">${escapeHtml(s.student_id)}${dayLabel}</span>` +
       `<span class="${badgeClass}" data-badge>${badgeText}</span>`;
 
     const toggle = document.createElement('button');
@@ -1921,6 +1922,25 @@ function wireEvents() {
   $('gradeTabClasswork').addEventListener('click', () => { setGradeTab('classwork'); loadGradeSubmissions(); });
   $('gradeTabAssignment').addEventListener('click', () => { setGradeTab('assignment'); loadGradeSubmissions(); });
   $('gradeTabAbsent').addEventListener('click', () => { setGradeTab('absent'); loadAbsentStudents(); });
+  $('reopenClassworkBtn').addEventListener('click', async () => {
+    const subject = $('gradeSubjectPick').value;
+    if (!subject) { $('gradeModalMsg').textContent = 'Select a subject first.'; return; }
+    const meta = (state.subjects || []).find((s) => s.subject === subject);
+    const department = meta?.department || 'general';
+    const btn = $('reopenClassworkBtn');
+    btn.disabled = true; btn.textContent = 'Reopening…';
+    try {
+      const { message } = await api('/api/admin/reopen-classwork', {
+        method: 'POST',
+        body: JSON.stringify({ subject, department }),
+      });
+      $('gradeModalMsg').textContent = '✅ ' + message;
+      btn.textContent = '🔓 Reopened';
+    } catch (e) {
+      $('gradeModalMsg').textContent = '❌ ' + e.message;
+      btn.disabled = false; btn.textContent = '🔓 Reopen classwork';
+    }
+  });
 
   // Admin  Questions modal
   $('adminQuestionsBtn').addEventListener('click', openQuestionsModal);

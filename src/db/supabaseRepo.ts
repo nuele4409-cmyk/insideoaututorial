@@ -515,6 +515,38 @@ export async function getAllSubmissions(
   return (data as Submission[]) ?? [];
 }
 
+export async function getAllSubmissionsAllDates(
+  subject: string,
+  type: 'classwork' | 'assignment' = 'assignment',
+): Promise<Submission[]> {
+  const { data, error } = await sb
+    .from('tutor_submissions')
+    .select('*')
+    .eq('subject', subject)
+    .eq('submission_type', type)
+    .order('day_number', { ascending: false })
+    .order('submitted_at', { ascending: true });
+  if (error) throw error;
+  return (data as Submission[]) ?? [];
+}
+
+export async function reopenClassworkDeadline(subject: string, department: string): Promise<boolean> {
+  const { data } = await sb
+    .from('tutor_daily_lessons')
+    .select('id')
+    .eq('subject', subject)
+    .eq('department', department)
+    .order('day_number', { ascending: false })
+    .limit(1);
+  if (!data || !data.length) return false;
+  const { error } = await sb
+    .from('tutor_daily_lessons')
+    .update({ goes_live_at: new Date().toISOString() })
+    .eq('id', data[0].id);
+  if (error) throw error;
+  return true;
+}
+
 export async function saveManualGrade(
   submissionId: string,
   score: number,

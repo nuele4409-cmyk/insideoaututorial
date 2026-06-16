@@ -634,7 +634,7 @@ app.get(
   }),
 );
 
-// Admin: list all submissions for a subject+date (supports ?type=classwork|assignment).
+// Admin: list all submissions for a subject across all dates (supports ?type=classwork|assignment).
 app.get(
   '/api/admin/submissions',
   wrap(async (req, res) => {
@@ -643,14 +643,26 @@ app.get(
       return;
     }
     const subject = String(req.query.subject ?? '').toLowerCase();
-    const date = String(req.query.date ?? todayWAT());
     const type = req.query.type === 'classwork' ? 'classwork' : 'assignment';
     if (!subject) {
       res.status(400).json({ error: 'subject is required.' });
       return;
     }
-    const submissions = await repo.getAllSubmissions(subject, date, type);
+    const submissions = await repo.getAllSubmissionsAllDates(subject, type);
     res.json({ submissions });
+  }),
+);
+
+// Admin: reopen classwork window for the most recent lesson of a subject (resets goes_live_at to now).
+app.post(
+  '/api/admin/reopen-classwork',
+  wrap(async (req, res) => {
+    if (!(await requireAdmin(req))) { res.status(403).json({ error: 'Admin only.' }); return; }
+    const { subject, department } = req.body ?? {};
+    if (!subject || !department) { res.status(400).json({ error: 'subject and department are required.' }); return; }
+    const ok = await repo.reopenClassworkDeadline(subject.toLowerCase(), department.toLowerCase());
+    if (!ok) { res.status(404).json({ error: 'No lesson found for this subject.' }); return; }
+    res.json({ ok: true, message: 'Classwork window reopened for 2 hours from now.' });
   }),
 );
 
