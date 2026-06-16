@@ -311,18 +311,32 @@ function showCheckpointGate(container, question) {
   return new Promise((resolve) => {
     const gate = document.createElement('div');
     gate.className = 'checkpoint-gate card-reveal';
-    gate.innerHTML =
-      '<div class="checkpoint-icon"></div>' +
-      '<div class="checkpoint-question">' + question + '</div>' +
-      '<p class="checkpoint-hint">Write your answer in your notebook. Take your time  click when you are ready.</p>' +
-      '<button class="btn btn-accent checkpoint-btn">I\'ve answered  continue</button>';
-    const btn = gate.querySelector('.checkpoint-btn');
+
+    const icon = document.createElement('div');
+    icon.className = 'checkpoint-icon';
+    gate.appendChild(icon);
+
+    const qDiv = document.createElement('div');
+    qDiv.className = 'checkpoint-question';
+    qDiv.innerHTML = question;
+    gate.appendChild(qDiv);
+
+    const hint = document.createElement('p');
+    hint.className = 'checkpoint-hint';
+    hint.textContent = 'Write your answer in your notebook. Take your time — click when you are ready.';
+    gate.appendChild(hint);
+
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-accent checkpoint-btn';
+    btn.textContent = 'I’ve answered — continue';
     btn.addEventListener('click', () => {
       btn.disabled = true;
-      btn.textContent = ' Answered';
+      btn.textContent = '✓ Answered';
       gate.classList.add('checkpoint-done');
       resolve();
     });
+    gate.appendChild(btn);
+
     container.appendChild(gate);
     gate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
@@ -331,11 +345,27 @@ function showCheckpointGate(container, question) {
 function appendCheckGate(container, question) {
   const gate = document.createElement('div');
   gate.className = 'checkpoint-gate checkpoint-done';
-  gate.innerHTML =
-    '<div class="checkpoint-icon"></div>' +
-    '<div class="checkpoint-question">' + question + '</div>' +
-    '<p class="checkpoint-hint">Write your answer in your notebook. Take your time  click when you are ready.</p>' +
-    '<button class="btn btn-secondary checkpoint-btn" disabled> Answered</button>';
+
+  const icon = document.createElement('div');
+  icon.className = 'checkpoint-icon';
+  gate.appendChild(icon);
+
+  const qDiv = document.createElement('div');
+  qDiv.className = 'checkpoint-question';
+  qDiv.innerHTML = question;
+  gate.appendChild(qDiv);
+
+  const hint = document.createElement('p');
+  hint.className = 'checkpoint-hint';
+  hint.textContent = 'Write your answer in your notebook. Take your time — click when you are ready.';
+  gate.appendChild(hint);
+
+  const btn = document.createElement('button');
+  btn.className = 'btn btn-secondary checkpoint-btn';
+  btn.disabled = true;
+  btn.textContent = '✓ Answered';
+  gate.appendChild(btn);
+
   container.appendChild(gate);
 }
 

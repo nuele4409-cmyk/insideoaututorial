@@ -30,7 +30,12 @@ function renderMath(text: string): string {
   return parts.join('');
 }
 function enrichLesson(lesson: any) {
-  return lesson ? { ...lesson, lesson_content_html: renderMath(lesson.lesson_content) } : null;
+  if (!lesson) return null;
+  const raw = lesson.lesson_content ?? '';
+  // If the DB content already has rendered KaTeX HTML (e.g. Claude output it directly),
+  // skip renderMath so we don't double-encode the <span> tags via _esc().
+  const html = raw.includes('class="katex"') ? raw : renderMath(raw);
+  return { ...lesson, lesson_content_html: html };
 }
 
 const app = express();
