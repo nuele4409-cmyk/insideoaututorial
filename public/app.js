@@ -174,8 +174,8 @@ async function loadClassroom() {
 
     // Fetch both classwork and assignment submissions in parallel
     const [classworkRes, assignmentRes] = await Promise.all([
-      api(`/api/classwork/mine?studentId=${encodeURIComponent(state.student.id)}&subject=${encodeURIComponent(state.subject)}`),
-      api(`/api/submissions/mine?studentId=${encodeURIComponent(state.student.id)}&subject=${encodeURIComponent(state.subject)}`),
+      api(`/api/classwork/mine?subject=${encodeURIComponent(state.subject)}`),
+      api(`/api/submissions/mine?subject=${encodeURIComponent(state.subject)}`),
     ]);
     const classworkSub = classworkRes.submission ?? null;
     const assignmentSub = assignmentRes.submission ?? null;
@@ -443,15 +443,20 @@ function showQuestionSection() {
   }, 1000);
 }
 
+let _pollTimer = null;
+
 function showNoLesson() {
   if (_countdownTimer) { clearInterval(_countdownTimer); _countdownTimer = null; }
+  // Auto-poll every 45s so students see the class appear without refreshing
+  if (_pollTimer) clearTimeout(_pollTimer);
+  _pollTimer = setTimeout(() => { _pollTimer = null; if (state.subject && !_countdownTimer) loadClassroom(); }, 45_000);
   const p = $('noLesson').querySelector('p');
   if (p) p.textContent = `Today's ${cap(state.subject || 'class')} lesson hasn't been opened yet. Check back soon.`;
   $('noLesson').classList.remove('hidden');
   $('lessonView').classList.add('hidden');
 }
 
-//  Scheduled-class countdown 
+//  Scheduled-class countdown
 let _countdownTimer = null;
 
 function startScheduledCountdown(goesLiveAt, subject, dept) {
@@ -577,7 +582,7 @@ async function refreshClassworkGrade() {
   if (!state.student || !state.subject) return;
   try {
     const { submission } = await api(
-      `/api/classwork/mine?studentId=${encodeURIComponent(state.student.id)}&subject=${encodeURIComponent(state.subject)}`,
+      `/api/classwork/mine?subject=${encodeURIComponent(state.subject)}`,
     );
     if (submission?.score !== null && submission?.score !== undefined) {
       showClassworkGrade(submission.score, submission.feedback);
@@ -678,7 +683,7 @@ async function refreshGrade() {
   if (!state.student || !state.subject) return;
   try {
     const { submission } = await api(
-      `/api/submissions/mine?studentId=${encodeURIComponent(state.student.id)}&subject=${encodeURIComponent(state.subject)}`,
+      `/api/submissions/mine?subject=${encodeURIComponent(state.subject)}`,
     );
     if (submission?.score !== null && submission?.score !== undefined) {
       showGrade(submission.score, submission.feedback);
@@ -1630,7 +1635,7 @@ async function openProgressModal() {
     return;
   }
   try {
-    const { overview } = await api(`/api/progress/overview?studentId=${encodeURIComponent(state.student.id)}`);
+    const { overview } = await api(`/api/progress/overview`);
     if (!overview || !overview.length) {
       list.innerHTML = '<p style="color:var(--muted)">No progress data yet.</p>';
       return;
@@ -1782,7 +1787,7 @@ async function loadSubmissionsForSubject(subject) {
   list.innerHTML = '<p style="color:var(--muted)">Loading...</p>';
   try {
     const { submissions } = await api(
-      `/api/submissions/history?studentId=${encodeURIComponent(state.student.id)}&subject=${encodeURIComponent(subject)}`,
+      `/api/submissions/history?subject=${encodeURIComponent(subject)}`,
     );
     if (!submissions || !submissions.length) {
       list.innerHTML = '<p style="color:var(--muted)">No submissions yet for this subject.</p>';
