@@ -689,6 +689,21 @@ app.get(
   }),
 );
 
+// Student: get all their own submissions (both types) for a subject across all days.
+app.get(
+  '/api/submissions/history',
+  wrap(async (req, res) => {
+    const studentId = String(req.query.studentId ?? '').trim();
+    const subject = String(req.query.subject ?? '').trim().toLowerCase();
+    if (!studentId || !subject) {
+      res.status(400).json({ error: 'studentId and subject are required.' });
+      return;
+    }
+    const submissions = await repo.getStudentSubmissions(studentId, subject);
+    res.json({ submissions });
+  }),
+);
+
 // Admin: set a new password for any student account.
 app.post(
   '/api/admin/set-password',

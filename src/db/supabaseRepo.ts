@@ -489,6 +489,16 @@ export async function saveGradeResults(
   );
 }
 
+export async function getStudentSubmissions(studentId: string, subject: string): Promise<Submission[]> {
+  const { data } = await sb
+    .from('tutor_submissions')
+    .select('*')
+    .eq('student_id', studentId)
+    .eq('subject', subject)
+    .order('day_number', { ascending: false });
+  return (data as Submission[]) ?? [];
+}
+
 export async function getAllSubmissions(
   subject: string,
   date: string,

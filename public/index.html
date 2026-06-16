@@ -94,6 +94,7 @@
         <div class="status-actions">
           <button class="link-btn" id="myProgressBtn">📊 My Progress</button>
           <button class="link-btn" id="pastClassesBtn">📖 Past Classes</button>
+          <button class="link-btn" id="mySubmissionsBtn">📋 My Submissions</button>
         </div>
       </section>
 
@@ -322,6 +323,18 @@
     </div>
   </div>
 
+  <!-- Student: My Submissions modal -->
+  <div id="submissionsModal" class="modal-overlay hidden">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-head">
+        <h2>📋 My Submissions</h2>
+        <button id="submissionsModalClose" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div id="submissionsSubjectBar" style="margin-bottom:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+      <div id="submissionsList" class="grade-list"></div>
+    </div>
+  </div>
+
   <!--  Admin: Student questions panel  -->
   <div id="questionsModal" class="modal-overlay hidden">
     <div class="modal-box modal-box-wide">
@@ -379,6 +392,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=20"></script>
+  <script src="/app.js?v=21"></script>
 </body>
 </html>

@@ -1634,19 +1634,22 @@ async function openProgressModal() {
       list.innerHTML = '<p style="color:var(--muted)">No progress data yet.</p>';
       return;
     }
-    list.innerHTML = overview.map((s) => {
+    const enrolledKeys = new Set((state.subjects || []).map((s) => s.subject));
+    const filtered = overview.filter((s) => enrolledKeys.has(s.subject));
+    list.innerHTML = (filtered.length ? filtered : overview).map((s) => {
       const pct = s.totalClassDays ? Math.round(s.daysAttended / s.totalClassDays * 100) : 0;
+      const barColor = pct >= 75 ? 'var(--purple)' : pct >= 50 ? 'var(--blue)' : 'var(--red)';
       return `<div class="grade-row-card">
         <div class="grade-row-header">
           <span class="grade-row-id">${escapeHtml(s.label || s.subject)}</span>
           <span class="grade-row-badge">${s.daysAttended}/${s.totalClassDays} days</span>
         </div>
-        <div style="font-size:13px;color:var(--muted);">
-          ${s.avgScore !== null ? `Avg score: <strong style="color:var(--white)">${s.avgScore}%</strong>` : 'No scores yet'}
-          ${s.lastDayAttended ? ` &bull; Last: Day ${s.lastDayAttended}` : ''}
+        <div style="font-size:13px;color:var(--muted);margin-top:2px;">
+          ${s.avgScore !== null ? `Avg score: <strong style="color:var(--white)">${s.avgScore}/10</strong>` : 'No scores yet'}
+          ${s.lastDayAttended ? ` &bull; Last class: Day ${s.lastDayAttended}` : ''}
         </div>
-        <div style="background:var(--srf-h);border-radius:6px;height:6px;overflow:hidden;margin-top:4px;">
-          <div style="height:100%;width:${pct}%;background:var(--purple);border-radius:6px;transition:width 0.4s;"></div>
+        <div style="background:var(--srf-h);border-radius:6px;height:6px;overflow:hidden;margin-top:8px;">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:6px;transition:width 0.4s;"></div>
         </div>
       </div>`;
     }).join('');
@@ -1744,6 +1747,88 @@ async function loadPastLesson(subject, department, day) {
   }
 }
 
+//  Student: My Submissions
+async function openSubmissionsModal() {
+  $('submissionsModal').classList.remove('hidden');
+  $('submissionsList').innerHTML = '<p style="color:var(--muted)">Loading...</p>';
+
+  const bar = $('submissionsSubjectBar');
+  bar.innerHTML = '';
+
+  const subjects = state.subjects || [];
+  if (!subjects.length || !state.student) {
+    $('submissionsList').innerHTML = '<p style="color:var(--muted)">No subjects available.</p>';
+    return;
+  }
+
+  subjects.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'grade-tab' + (i === 0 ? ' grade-tab-active' : '');
+    btn.textContent = s.label || s.subject;
+    btn.addEventListener('click', () => {
+      bar.querySelectorAll('.grade-tab').forEach((b) => b.classList.remove('grade-tab-active'));
+      btn.classList.add('grade-tab-active');
+      loadSubmissionsForSubject(s.subject);
+    });
+    bar.appendChild(btn);
+  });
+
+  loadSubmissionsForSubject(subjects[0].subject);
+}
+
+async function loadSubmissionsForSubject(subject) {
+  const list = $('submissionsList');
+  list.innerHTML = '<p style="color:var(--muted)">Loading...</p>';
+  try {
+    const { submissions } = await api(
+      `/api/submissions/history?studentId=${encodeURIComponent(state.student.id)}&subject=${encodeURIComponent(subject)}`,
+    );
+    if (!submissions || !submissions.length) {
+      list.innerHTML = '<p style="color:var(--muted)">No submissions yet for this subject.</p>';
+      return;
+    }
+
+    // Group by day_number
+    const byDay = {};
+    for (const s of submissions) {
+      if (!byDay[s.day_number]) byDay[s.day_number] = {};
+      byDay[s.day_number][s.submission_type] = s;
+    }
+
+    list.innerHTML = '';
+    Object.keys(byDay).sort((a, b) => Number(b) - Number(a)).forEach((day) => {
+      const cw = byDay[day]['classwork'] || null;
+      const asgn = byDay[day]['assignment'] || null;
+      const date = (cw || asgn)?.lesson_date || '';
+
+      const renderSub = (sub, label) => {
+        if (!sub) return `<div style="font-size:13px;color:var(--dim);padding:4px 0 2px;">${label}: <em>not submitted</em></div>`;
+        const scoreHtml = sub.score !== null
+          ? `<span style="font-weight:800;color:var(--gold2);margin-left:6px;">${sub.score}/10</span>`
+          : `<span style="color:var(--dim);margin-left:6px;">awaiting grade</span>`;
+        return `<div style="border:1px solid var(--brd);border-radius:10px;padding:10px 14px;margin-top:8px;">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;">${label}${scoreHtml}</div>
+          ${sub.submission_text ? `<div style="font-size:13.5px;color:var(--white);line-height:1.65;white-space:pre-wrap;">${escapeHtml(sub.submission_text)}</div>` : ''}
+          ${sub.submission_file_url ? `<a href="${escapeHtml(sub.submission_file_url)}" target="_blank" rel="noopener" class="attach-file-link" style="display:inline-block;margin-top:6px;font-size:13px;">📎 View attachment</a>` : ''}
+          ${sub.feedback ? `<div style="font-size:13px;color:#a78bfa;margin-top:8px;font-style:italic;border-top:1px solid var(--brd);padding-top:8px;">Teacher: "${escapeHtml(sub.feedback)}"</div>` : ''}
+        </div>`;
+      };
+
+      const card = document.createElement('div');
+      card.className = 'grade-row-card';
+      card.innerHTML = `<div class="grade-row-header">
+        <span class="grade-row-id">Day ${day}</span>
+        <span style="font-size:12px;color:var(--dim);">${escapeHtml(date)}</span>
+      </div>
+      ${renderSub(cw, '✏️ Classwork')}
+      ${renderSub(asgn, '📝 Assignment')}`;
+      list.appendChild(card);
+    });
+  } catch (e) {
+    list.innerHTML = `<p style="color:var(--red)">${escapeHtml(e.message)}</p>`;
+  }
+}
+
 //  Admin: Absent students
 async function loadAbsentStudents() {
   const subject = $('gradeSubjectPick').value;
@@ -1826,6 +1911,8 @@ function wireEvents() {
   $('progressModalClose').addEventListener('click', () => $('progressModal').classList.add('hidden'));
   $('pastClassesBtn').addEventListener('click', openPastClassesModal);
   $('pastClassesModalClose').addEventListener('click', () => $('pastClassesModal').classList.add('hidden'));
+  $('mySubmissionsBtn').addEventListener('click', openSubmissionsModal);
+  $('submissionsModalClose').addEventListener('click', () => $('submissionsModal').classList.add('hidden'));
 
   // Admin  Grade modal
   $('adminGradeBtn').addEventListener('click', openGradeModal);

@@ -269,6 +269,9 @@ export async function getPendingSubmissions(_subject: string, _date: string, _li
 export async function saveGradeResults(_results: Array<{ id: string; score: number; feedback: string }>): Promise<void> {
   throw new Error(GROUP_CLASS_ERR);
 }
+export async function getStudentSubmissions(_studentId: string, _subject: string): Promise<Submission[]> {
+  throw new Error(GROUP_CLASS_ERR);
+}
 export async function getAllSubmissions(_subject: string, _date: string, _type?: string): Promise<Submission[]> {
   throw new Error(GROUP_CLASS_ERR);
 }
