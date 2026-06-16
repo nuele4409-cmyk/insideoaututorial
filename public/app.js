@@ -779,10 +779,10 @@ function updateStatus({ day, topic, score, submitted } = {}) {
 }
 
 function resetStatus() {
-  $('statDay').textContent = '';
-  $('statTopic').textContent = '';
-  $('statScore').textContent = '';
-  $('statSubmitted').textContent = '';
+  $('statDay').textContent = '—';
+  $('statTopic').textContent = '—';
+  $('statScore').textContent = '—';
+  $('statSubmitted').textContent = '—';
 }
 
 function setBusy(b) {
