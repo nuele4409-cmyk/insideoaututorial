@@ -235,7 +235,7 @@ function parseSections(content) {
     if (secMatch) {
       const num = parseInt(secMatch[1], 10);
       const paragraphs = secMatch[2].trim()
-        .split(/\n{2,}|\n/).map((s) => s.trim()).filter(Boolean);
+        .split(/\n{2,}/).map((s) => s.trim()).filter(Boolean);
       result.push({ type: 'section', num, paragraphs });
     } else if (chkMatch) {
       const num = parseInt(chkMatch[1], 10);
@@ -244,7 +244,7 @@ function parseSections(content) {
   }
   // Fallback: if no section markers found, treat entire content as one block
   if (!result.length) {
-    const paragraphs = String(content).split(/\n{2,}|\n/).map((s) => s.trim()).filter(Boolean);
+    const paragraphs = String(content).split(/\n{2,}/).map((s) => s.trim()).filter(Boolean);
     result.push({ type: 'section', num: 1, paragraphs });
   }
   return result;
@@ -303,7 +303,7 @@ function appendPara(container, text, animate) {
   if (animate) p.classList.add('para-reveal');
   p.textContent = text;
   container.appendChild(p);
-  typesetEl(p);
+  if (animate) typesetEl(p);
 }
 
 //  Checkpoint gates 

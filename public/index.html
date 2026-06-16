@@ -29,12 +29,20 @@
   <script>
     MathJax = {
       tex: {
-        inlineMath: [['$', '$']],
-        displayMath: [['$$', '$$']],
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
         processEscapes: true,
       },
       options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
-      startup: { typeset: false },
+      startup: {
+        typeset: false,
+        ready() {
+          MathJax.startup.defaultReady();
+          // Typeset any lesson content that was rendered before this script finished loading
+          const lb = document.getElementById('lessonBody');
+          if (lb && lb.hasChildNodes()) MathJax.typesetPromise([lb]).catch(() => {});
+        }
+      },
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
@@ -390,6 +398,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=16"></script>
+  <script src="/app.js?v=17"></script>
 </body>
 </html>
