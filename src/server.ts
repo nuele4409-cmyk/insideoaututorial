@@ -816,6 +816,12 @@ app.delete(
 
 // ── Static web client ────────────────────────────────────────────────────────
 
+// Serve KaTeX from local node_modules so students don't depend on a CDN
+import { createRequire } from 'module';
+const _require = createRequire(import.meta.url);
+const katexDist = _require.resolve('katex/dist/katex.min.js').replace(/katex\.min\.js$/, '');
+app.use('/katex', express.static(katexDist));
+
 app.use(express.static(CONFIG.publicDir));
 
 // ── Error handler ────────────────────────────────────────────────────────────
