@@ -1240,14 +1240,42 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
     msg.textContent = ' Claude is writing the lesson  this takes 13 minutes. Please wait.';
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 360_000); // 6-min hard limit
+    const timeout = setTimeout(() => controller.abort(), 600_000); // 10-min hard limit
 
     try {
-      const { lesson, isNew } = await api('/api/lessons/generate', {
+      // SSE stream — server sends heartbeats every 8s so Railway doesn't 502
+      const resp = await fetch('/api/lessons/generate', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.token}` },
         body: JSON.stringify({ subject, department, goes_live_at: goesLiveAt }),
         signal: controller.signal,
       });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+        throw new Error(err.error || `HTTP ${resp.status}`);
+      }
+      // Read SSE chunks until we get a non-heartbeat event
+      const reader = resp.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '';
+      let result = null;
+      outer: while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const events = buf.split('\n\n');
+        buf = events.pop();
+        for (const ev of events) {
+          if (!ev.startsWith('data: ')) continue;
+          const data = JSON.parse(ev.slice(6));
+          if (data.status === 'generating') continue; // heartbeat — keep waiting
+          if (data.error) throw new Error(data.error);
+          result = data;
+          break outer;
+        }
+      }
+      if (!result) throw new Error('No response from server.');
+      const { lesson, isNew } = result;
       const liveTimeStr = new Date(goesLiveAt).toLocaleString();
       if (isNew) {
         msg.textContent = ` "${lesson.topic}" scheduled  students will see it at ${liveTimeStr}.`;

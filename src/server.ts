@@ -394,8 +394,26 @@ app.post(
       goesLiveAt = d.toISOString();
     }
 
-    const result = await openClass(subject, department, goesLiveAt);
-    res.json({ lesson: result.lesson, isNew: result.isNew });
+    // Use SSE so Railway's 60s HTTP timeout doesn't kill a 2-3 min Claude generation.
+    // Heartbeat pings every 8s keep the connection alive; final event carries the result.
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const send = (data: object) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+    const heartbeat = setInterval(() => send({ status: 'generating' }), 8_000);
+
+    try {
+      const result = await openClass(subject, department, goesLiveAt);
+      clearInterval(heartbeat);
+      send({ lesson: result.lesson, isNew: result.isNew });
+    } catch (e) {
+      clearInterval(heartbeat);
+      send({ error: (e as Error).message });
+    } finally {
+      res.end();
+    }
   }),
 );
 
