@@ -45,7 +45,7 @@ export async function generateLesson(
     `Use these exact markers on their own lines. Do not rename, skip, or reorder any of them:\n\n` +
 
     `## SECTION 1\n` +
-    `Write exactly 12 paragraphs. Opening and Foundation — approximately 25 minutes of session time.\n` +
+    `Write exactly 18 paragraphs. Opening and Foundation — approximately 30 minutes of session time.\n` +
     `Paragraph 1: Warm personal greeting. Tell the student what today's topic is and why it matters.\n` +
     `Paragraph 2: Connect today's topic to something the student already knows from real life in Nigeria.\n` +
     `Paragraph 3: Give the historical or scientific context — how did humans discover or develop this idea?\n` +
@@ -57,7 +57,13 @@ export async function generateLesson(
     `Paragraph 9: Give a real-world or Nigerian example that makes both foundational ideas vivid and memorable.\n` +
     `Paragraph 10: Address the most common confusion students have at this stage. Resolve it clearly.\n` +
     `Paragraph 11: Explain why understanding this foundation properly makes the rest of the topic easy.\n` +
-    `Paragraph 12: Summarise the foundation in a way that sets up Section 2. Build anticipation.\n\n` +
+    `Paragraph 12: Give a second Nigerian example — different context from paragraph 9 — that further cements the idea.\n` +
+    `Paragraph 13: Anticipate the question the student is probably thinking right now. Answer it directly.\n` +
+    `Paragraph 14: Introduce a third foundational idea if the topic has one, or deepen the second foundational idea further.\n` +
+    `Paragraph 15: Explain what happens when students skip understanding this foundation — what goes wrong in the exam.\n` +
+    `Paragraph 16: Tell the student how many marks this topic typically carries in Post-UTME and why it is worth mastering.\n` +
+    `Paragraph 17: Distinguish what must be memorised versus what must be understood for this topic.\n` +
+    `Paragraph 18: Summarise the foundation in a way that sets up Section 2. Build anticipation.\n\n` +
 
     `## CHECK 1\n` +
     `One reflective question the student writes a full answer to in their notebook (3 to 5 minutes). ` +
@@ -65,7 +71,7 @@ export async function generateLesson(
     `No markdown.\n\n` +
 
     `## SECTION 2\n` +
-    `Write exactly 15 paragraphs. Core Concept and Worked Examples — approximately 35 minutes.\n` +
+    `Write exactly 22 paragraphs. Core Concept and Worked Examples — approximately 45 minutes.\n` +
     `Paragraph 1: Transition from Section 1. Tell the student you are now going into the core of the topic.\n` +
     `Paragraph 2: State the central concept of this topic precisely and completely.\n` +
     `Paragraph 3: Explain the logic behind the central concept — why does it work this way?\n` +
@@ -77,17 +83,24 @@ export async function generateLesson(
     `Paragraph 9: Introduce Worked Example 2 — a different variation of the same concept.\n` +
     `Paragraph 10: Walk through Worked Example 2 step by step, emphasising what is different from Example 1.\n` +
     `Paragraph 11: Complete Worked Example 2 and draw out the lesson from comparing both examples.\n` +
-    `Paragraph 12: Discuss the edge cases and variations of the central concept the student must know.\n` +
-    `Paragraph 13: Explain what happens when the central concept is combined with other ideas the student knows.\n` +
-    `Paragraph 14: Give one more brief example that tests whether the student has really understood.\n` +
-    `Paragraph 15: Consolidate Section 2. What are the two or three things the student must now have mastered?\n\n` +
+    `Paragraph 12: Introduce Worked Example 3 — a harder or combined problem that requires deeper thinking.\n` +
+    `Paragraph 13: Walk through the first part of Worked Example 3, explaining the reasoning at each step.\n` +
+    `Paragraph 14: Complete Worked Example 3. Identify what made it harder and how the student should recognise it.\n` +
+    `Paragraph 15: Revisit the central concept now that the student has seen three worked examples.\n` +
+    `Paragraph 16: Discuss the edge cases and variations of the central concept the student must know.\n` +
+    `Paragraph 17: Explain what happens when the central concept is combined with other ideas the student knows.\n` +
+    `Paragraph 18: Explain when the central concept does NOT apply or has limits — this prevents over-applying it.\n` +
+    `Paragraph 19: Connect today's concept to at least one other subject the student is studying for Post-UTME.\n` +
+    `Paragraph 20: Give one more brief self-test question and tell the student exactly what a correct answer looks like.\n` +
+    `Paragraph 21: Address the second most common misconception students have about this central concept.\n` +
+    `Paragraph 22: Consolidate Section 2. What are the three things the student must now have mastered?\n\n` +
 
     `## CHECK 2\n` +
     `One demanding question with a specific scenario or problem the student works through in their notebook ` +
     `(5 to 8 minutes). Tell them what a complete answer must include. No markdown.\n\n` +
 
     `## SECTION 3\n` +
-    `Write exactly 12 paragraphs. Exam Strategy, Patterns, and Mistakes — approximately 25 minutes.\n` +
+    `Write exactly 18 paragraphs. Exam Strategy, Patterns, and Mistakes — approximately 35 minutes.\n` +
     `Paragraph 1: Shift tone. Tell the student you are now going to show them how Post-UTME institutions actually test this topic.\n` +
     `Paragraph 2: Describe Exam Pattern 1 — what the question looks like and what it is testing.\n` +
     `Paragraph 3: Show the exact approach to Exam Pattern 1, step by step.\n` +
@@ -95,11 +108,17 @@ export async function generateLesson(
     `Paragraph 5: Show the exact approach to Exam Pattern 2 and how it differs from Pattern 1.\n` +
     `Paragraph 6: Describe Exam Pattern 3 — often a trick or combined question institutions love to set.\n` +
     `Paragraph 7: Show how to see through Exam Pattern 3 and approach it without panicking.\n` +
-    `Paragraph 8: Name Student Mistake 1 — the most common error on this topic. Explain exactly why students make it.\n` +
-    `Paragraph 9: Show the student precisely how to avoid Mistake 1.\n` +
-    `Paragraph 10: Name Student Mistake 2 — the second most common error. Explain it with a concrete example.\n` +
-    `Paragraph 11: Show how to avoid Mistake 2 and the habit of mind that prevents it.\n` +
-    `Paragraph 12: Give the student one clear mental strategy they can use in the exam room for this topic.\n\n` +
+    `Paragraph 8: Describe Exam Pattern 4 — a data-interpretation or graph-reading variation if applicable, otherwise another common pattern.\n` +
+    `Paragraph 9: Show the exact approach to Exam Pattern 4 and what to watch for.\n` +
+    `Paragraph 10: Name Student Mistake 1 — the most common error on this topic. Explain exactly why students make it.\n` +
+    `Paragraph 11: Show the student precisely how to avoid Mistake 1 with a corrected example.\n` +
+    `Paragraph 12: Name Student Mistake 2 — the second most common error. Explain it with a concrete example.\n` +
+    `Paragraph 13: Show how to avoid Mistake 2 and the habit of mind that prevents it.\n` +
+    `Paragraph 14: Name Student Mistake 3 — a subtler error that only careful students avoid. Explain it fully.\n` +
+    `Paragraph 15: Show how to avoid Mistake 3 and why this one separates high scorers from average scorers.\n` +
+    `Paragraph 16: Teach the student how to check their answer on this type of question — what sanity checks work?\n` +
+    `Paragraph 17: Walk through a time-management approach for this topic — how long should the student spend per question?\n` +
+    `Paragraph 18: Give the student one clear mental strategy they can use in the exam room for this topic.\n\n` +
 
     `## CHECK 3\n` +
     `Give the student a real Post-UTME-style exam question on this topic. Ask them to solve it fully in their ` +
@@ -107,18 +126,24 @@ export async function generateLesson(
     `After they answer, tell them exactly what the model answer includes. No markdown.\n\n` +
 
     `## SECTION 4\n` +
-    `Write exactly 11 paragraphs. Advanced Depth and Consolidation — approximately 20 minutes.\n` +
+    `Write exactly 17 paragraphs. Advanced Depth and Consolidation — approximately 30 minutes.\n` +
     `Paragraph 1: Tell the student you are now going beyond what most Post-UTME students study.\n` +
     `Paragraph 2: Introduce one advanced idea connected to today's topic that Post-UTME institutions test at a higher level.\n` +
     `Paragraph 3: Explain that advanced idea thoroughly and show why it is not as hard as it looks.\n` +
     `Paragraph 4: Connect the advanced idea back to the core concept from Section 2.\n` +
-    `Paragraph 5: Walk through one challenging combined example that tests deep understanding.\n` +
-    `Paragraph 6: Explain the solution to the combined example, emphasising the reasoning not just the steps.\n` +
-    `Paragraph 7: Connect today's topic explicitly to what the student has already learned in previous lessons.\n` +
-    `Paragraph 8: Tell the student what topic comes next and how today's lesson prepares them for it.\n` +
-    `Paragraph 9: Summarise the entire session — what were the four or five biggest ideas covered today?\n` +
-    `Paragraph 10: Begin with "Key takeaway:" — one precise, memorable statement of today's most important principle.\n` +
-    `Paragraph 11: End with genuine encouragement. Make the student feel capable, prepared, and motivated.\n\n` +
+    `Paragraph 5: Give an intuitive reason why the advanced idea is true — help the student own it rather than memorise it.\n` +
+    `Paragraph 6: Walk through one challenging combined example that tests deep understanding.\n` +
+    `Paragraph 7: Break down the first part of the combined example step by step, narrating the reasoning.\n` +
+    `Paragraph 8: Complete the combined example and explain what the result reveals about the topic.\n` +
+    `Paragraph 9: Introduce a second advanced idea or important extension that only the strongest students know.\n` +
+    `Paragraph 10: Explain this second advanced idea with at least one short illustrative example.\n` +
+    `Paragraph 11: Connect today's topic explicitly to what the student has already learned in previous lessons.\n` +
+    `Paragraph 12: Tell the student what topic comes next and exactly how today's lesson prepares them for it.\n` +
+    `Paragraph 13: Give the student a specific revision tip — what to review tonight to reinforce today's session.\n` +
+    `Paragraph 14: Share a memory trick, pattern, or mnemonic that helps lock in the most important formula or rule.\n` +
+    `Paragraph 15: Summarise the entire session — what were the five biggest ideas covered today?\n` +
+    `Paragraph 16: Begin with "Key takeaway:" — one precise, memorable statement of today's most important principle.\n` +
+    `Paragraph 17: End with genuine encouragement. Make the student feel capable, prepared, and motivated.\n\n` +
 
     `## CLASSWORK\n` +
     `A two-part in-class exercise completed before leaving today's session.\n` +

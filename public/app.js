@@ -129,14 +129,14 @@ async function selectSubject(subject) {
   const meta = state.subjects.find((s) => s.subject === subject);
   state.subject = subject;
   state.subjectDept = meta?.department || 'general';
-  sessionStorage.removeItem(revealKey());
+  // Clear all seen keys for this subject so switching back always re-checks
+  for (let d = 0; d <= 365; d++) sessionStorage.removeItem(revealKey(d));
   await loadClassroom();
 }
 
-//  Reveal key for sessionStorage 
-function revealKey() {
-  const today = new Date().toISOString().slice(0, 10);
-  return `lesson_seen_${state.subject}_${today}`;
+//  Reveal key for sessionStorage — keyed by day number so each new lesson always animates fresh
+function revealKey(dayNumber) {
+  return `lesson_seen_${state.subject}_day${dayNumber || 0}`;
 }
 
 //  Classroom loader 
@@ -181,7 +181,7 @@ async function loadClassroom() {
     const assignmentSub = assignmentRes.submission ?? null;
 
     // If any submission exists, consider lesson already seen
-    const alreadySeen = !!sessionStorage.getItem(revealKey()) || !!classworkSub || !!assignmentSub;
+    const alreadySeen = !!sessionStorage.getItem(revealKey(lesson.day_number)) || !!classworkSub || !!assignmentSub;
 
     hideBanner();
     $('lessonView').classList.remove('hidden');
@@ -274,7 +274,7 @@ async function revealLesson(lesson, instant) {
   }
 
   // Animated: mark as seen immediately so refresh  instant
-  sessionStorage.setItem(revealKey(), '1');
+  sessionStorage.setItem(revealKey(lesson.day_number), '1');
 
   for (const block of blocks) {
     if (block.type === 'section') {
@@ -310,7 +310,7 @@ function showCheckpointGate(container, question) {
     gate.className = 'checkpoint-gate card-reveal';
     gate.innerHTML =
       '<div class="checkpoint-icon"></div>' +
-      '<div class="checkpoint-question">' + escapeHtml(question) + '</div>' +
+      '<div class="checkpoint-question">' + question + '</div>' +
       '<p class="checkpoint-hint">Write your answer in your notebook. Take your time  click when you are ready.</p>' +
       '<button class="btn btn-accent checkpoint-btn">I\'ve answered  continue</button>';
     const btn = gate.querySelector('.checkpoint-btn');
@@ -330,7 +330,7 @@ function appendCheckGate(container, question) {
   gate.className = 'checkpoint-gate checkpoint-done';
   gate.innerHTML =
     '<div class="checkpoint-icon"></div>' +
-    '<div class="checkpoint-question">' + escapeHtml(question) + '</div>' +
+    '<div class="checkpoint-question">' + question + '</div>' +
     '<p class="checkpoint-hint">Write your answer in your notebook. Take your time  click when you are ready.</p>' +
     '<button class="btn btn-secondary checkpoint-btn" disabled> Answered</button>';
   container.appendChild(gate);
