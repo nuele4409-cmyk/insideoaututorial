@@ -1595,23 +1595,32 @@ async function resetAllLessons() {
   }
 }
 
-//  MathJax helper: waits for async script to load before typesetting
+//  KaTeX helper: renders LaTeX in an element (polls until defer scripts load)
+const _KATEX_OPTS = {
+  delimiters: [
+    { left: '$$', right: '$$', display: true },
+    { left: '$', right: '$', display: false },
+    { left: '\\[', right: '\\]', display: true },
+    { left: '\\(', right: '\\)', display: false },
+  ],
+  throwOnError: false,
+  output: 'html',
+};
 function typesetEl(el) {
-  if (!window.MathJax) return;
-  if (typeof MathJax.typesetPromise === 'function') {
-    MathJax.typesetPromise([el]).catch(() => {});
+  if (typeof window.renderMathInElement === 'function') {
+    renderMathInElement(el, _KATEX_OPTS);
     return;
   }
-  // MathJax config exists but library hasn't loaded yet — poll
+  // auto-render.min.js not yet available (defer) — poll
   let attempts = 0;
   const poll = setInterval(() => {
-    if (typeof MathJax.typesetPromise === 'function') {
+    if (typeof window.renderMathInElement === 'function') {
       clearInterval(poll);
-      MathJax.typesetPromise([el]).catch(() => {});
-    } else if (++attempts > 30) {
+      renderMathInElement(el, _KATEX_OPTS);
+    } else if (++attempts > 40) {
       clearInterval(poll);
     }
-  }, 300);
+  }, 250);
 }
 
 //  Student: My Progress
