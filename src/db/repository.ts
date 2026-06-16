@@ -281,6 +281,9 @@ export async function getAllSubmissionsAllDates(_subject: string, _type?: string
 export async function reopenClassworkDeadline(_subject: string, _department: string): Promise<boolean> {
   throw new Error(GROUP_CLASS_ERR);
 }
+export async function rescheduleLesson(_subject: string, _department: string, _date: string, _goesLiveAt: string): Promise<boolean> {
+  throw new Error(GROUP_CLASS_ERR);
+}
 export async function saveManualGrade(_submissionId: string, _score: number, _feedback: string): Promise<void> {
   throw new Error(GROUP_CLASS_ERR);
 }

@@ -682,6 +682,30 @@ app.post(
   }),
 );
 
+// Admin: reschedule an existing lesson's goes_live_at without regenerating it.
+app.post(
+  '/api/admin/reschedule',
+  wrap(async (req, res) => {
+    if (!(await requireAdmin(req))) { res.status(403).json({ error: 'Admin only.' }); return; }
+    const { subject, department, goes_live_at } = req.body ?? {};
+    if (!subject || !department || !goes_live_at) {
+      res.status(400).json({ error: 'subject, department, and goes_live_at are required.' });
+      return;
+    }
+    const d = new Date(String(goes_live_at));
+    if (Number.isNaN(d.getTime())) {
+      res.status(400).json({ error: 'goes_live_at must be a valid ISO 8601 date-time.' });
+      return;
+    }
+    const date = todayWAT();
+    const ok = await repo.rescheduleLesson(
+      subject.toLowerCase(), department.toLowerCase(), date, d.toISOString(),
+    );
+    if (!ok) { res.status(404).json({ error: 'No lesson found for today.' }); return; }
+    res.json({ ok: true, goes_live_at: d.toISOString() });
+  }),
+);
+
 // Admin: save a manual grade for a submission.
 app.patch(
   '/api/admin/grade',

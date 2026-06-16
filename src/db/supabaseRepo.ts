@@ -547,6 +547,22 @@ export async function reopenClassworkDeadline(subject: string, department: strin
   return true;
 }
 
+export async function rescheduleLesson(
+  subject: string,
+  department: string,
+  date: string,
+  goesLiveAt: string,
+): Promise<boolean> {
+  const { error, count } = await sb
+    .from('tutor_daily_lessons')
+    .update({ goes_live_at: goesLiveAt })
+    .eq('subject', subject)
+    .eq('department', department)
+    .eq('lesson_date', date);
+  if (error) throw error;
+  return (count ?? 0) > 0;
+}
+
 export async function saveManualGrade(
   submissionId: string,
   score: number,

@@ -1254,7 +1254,38 @@ function openScheduleDialog(subject, department, metaEl, schedBtn) {
         metaEl.textContent = `Day ${lesson.day_number}  ${lesson.topic}  Scheduled: ${liveTimeStr}`;
         if (schedBtn) { schedBtn.textContent = ' Rescheduled'; schedBtn.disabled = true; }
       } else {
-        msg.textContent = ` A lesson already exists for today's ${cap(subject)} class. Remove it first if you want to reschedule.`;
+        // Lesson already exists — offer to just update goes_live_at without regenerating
+        clearInterval(elapsedTimer);
+        msg.innerHTML = '';
+        const info = document.createElement('div');
+        info.style.cssText = 'color:var(--muted);font-size:.88em;margin-bottom:8px;';
+        info.textContent = `A lesson already exists for today's ${cap(subject)} class. Do you want to move its live time to ${liveTimeStr}?`;
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'btn btn-accent btn-sm';
+        confirmBtn.textContent = 'Yes, reschedule it';
+        const noBtn = document.createElement('button');
+        noBtn.className = 'btn btn-sm';
+        noBtn.style.cssText = 'color:var(--muted);margin-left:8px;';
+        noBtn.textContent = 'Cancel';
+        msg.appendChild(info);
+        msg.appendChild(confirmBtn);
+        msg.appendChild(noBtn);
+        noBtn.addEventListener('click', () => { msg.innerHTML = ''; });
+        confirmBtn.addEventListener('click', async () => {
+          confirmBtn.disabled = true; confirmBtn.textContent = 'Rescheduling…';
+          try {
+            await api('/api/admin/reschedule', {
+              method: 'POST',
+              body: JSON.stringify({ subject, department, goes_live_at: goesLiveAt }),
+            });
+            msg.textContent = ` ${cap(subject)} rescheduled  students will see it at ${liveTimeStr}.`;
+            metaEl.textContent = `Day ${lesson.day_number}  ${lesson.topic}  Scheduled: ${liveTimeStr}`;
+            if (schedBtn) { schedBtn.textContent = ' Rescheduled'; schedBtn.disabled = true; }
+            if (state.subject === subject && state.subjectDept === department) await loadClassroom();
+          } catch (e) {
+            msg.textContent = ' ' + e.message;
+          }
+        });
         goBtn.disabled = false;
         cancelBtn.disabled = false;
         goBtn.textContent = 'Generate & Schedule';
